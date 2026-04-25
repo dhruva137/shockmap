@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: pharmashield-api
+    env: docker
+    region: singapore
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false

@@ -1,0 +1,17 @@
+# Python
+.env
+__pycache__/
+*.pyc
+venv/
+
+# Flutter
+build/
+.dart_tool/
+
+# Data
+data/raw/*
+data/processed/*
+
+# ML
+*.pt
+!ml/weights/

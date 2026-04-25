@@ -1,0 +1,3 @@
+"""
+Drug dependency model.
+"""
