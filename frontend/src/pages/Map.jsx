@@ -543,12 +543,14 @@ export default function MapView() {
         <MapContainer
           center={regionConf.center}
           zoom={regionConf.zoom}
-          style={{ height: '100%', width: '100%', background: '#05070f' }}
+          style={{ height: '100%', width: '100%', background: '#1e2330' }}
           zoomControl={false}
         >
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            opacity={0.7}
+            className="map-tiles-blend"
           />
 
           <MapUpdater
@@ -574,8 +576,8 @@ export default function MapView() {
               >
                 <Popup>
                   <div style={{ minWidth: 160 }}>
-                    <strong style={{ fontSize: '0.82rem' }}>
-                      🇨🇳 {c.source.name} ➜ 🇮🇳 {c.target.name}
+                    <strong style={{ fontSize: '0.82rem', fontFamily: 'var(--mono)' }}>
+                      {c.source.name} ➜ {c.target.name}
                     </strong>
                     <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 6 }}>
                       {c.weight} dependent product{c.weight > 1 ? 's' : ''} on this route
@@ -681,16 +683,15 @@ export default function MapView() {
                 <Popup>
                   <div style={{ minWidth: 160 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                      <span>🇨🇳</span>
-                      <strong style={{ fontSize: '0.9rem' }}>{p.name}</strong>
+                      <strong style={{ fontSize: '0.9rem', fontFamily: 'var(--mono)' }}>{p.name.toUpperCase()}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: 4 }}>
                       <span style={{ color: '#9ca3af' }}>Risk Score:</span>
                       <strong style={{ color }}>{p.risk_score.toFixed(1)}</strong>
                     </div>
                     {isShocked && (
-                      <div style={{ fontSize: '0.75rem', color: '#f43f5e', fontWeight: 600, marginBottom: 4 }}>
-                        ⚠ {p.shock_count} Active Shock{p.shock_count > 1 ? 's' : ''}
+                      <div style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 600, marginBottom: 4, fontFamily: 'var(--mono)' }}>
+                        {p.shock_count} ACTIVE SHOCK{p.shock_count > 1 ? 'S' : ''}
                       </div>
                     )}
                     {p.top_affected_inputs?.length > 0 && (
@@ -728,16 +729,15 @@ export default function MapView() {
                 <Popup>
                   <div style={{ minWidth: 150 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                      <span>🇮🇳</span>
-                      <strong style={{ fontSize: '0.9rem' }}>{p.name}</strong>
+                      <strong style={{ fontSize: '0.9rem', fontFamily: 'var(--mono)' }}>{p.name.toUpperCase()}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: 4 }}>
                       <span style={{ color: '#9ca3af' }}>Dependency Risk:</span>
                       <strong style={{ color }}>{p.risk_score.toFixed(1)}</strong>
                     </div>
                     {p.shock_count > 0 && (
-                      <div style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 600, marginBottom: 4 }}>
-                        📡 {p.shock_count} upstream shock{p.shock_count > 1 ? 's' : ''}
+                      <div style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 600, marginBottom: 4, fontFamily: 'var(--mono)' }}>
+                        {p.shock_count} UPSTREAM SHOCK{p.shock_count > 1 ? 'S' : ''}
                       </div>
                     )}
                     {p.top_affected_inputs?.length > 0 && (
@@ -760,6 +760,7 @@ export default function MapView() {
 
         {/* Map CSS Overrides */}
         <style dangerouslySetInnerHTML={{ __html: `
+          .map-tiles-blend { filter: invert(0.9) hue-rotate(180deg) brightness(1.2) contrast(1.1) saturate(0.2) sepia(0.2) !important; mix-blend-mode: luminosity; }
           .animated-polyline { animation: dash 30s linear infinite; }
           @keyframes dash { to { stroke-dashoffset: -1000; } }
           .leaflet-popup-content-wrapper, .leaflet-popup-tip {
