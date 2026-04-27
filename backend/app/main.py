@@ -37,9 +37,9 @@ LIVE_SHOCK_PATHS = (
 )
 
 app = FastAPI(
-    title="PharmaShield API",
+    title="ShockMap API",
     version="1.0.0",
-    description="National Pharma-Import Dependency Intelligence",
+    description="National Supply Chain Security Intelligence",
     docs_url="/docs",
     redoc_url=None
 )
@@ -142,7 +142,7 @@ def get_health_status():
 @app.on_event("startup")
 async def startup_event():
     """Initializes system services and loads data on startup."""
-    logger.info("PharmaShield starting...")
+    logger.info("ShockMap starting...")
     
     # Load Data
     dl = get_data_loader()
@@ -188,7 +188,7 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"Shock detector could not start (non-fatal): {e}")
 
-    logger.info("PharmaShield startup sequence complete.")
+    logger.info("ShockMap startup sequence complete.")
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):

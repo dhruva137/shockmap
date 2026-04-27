@@ -21,7 +21,7 @@ export default function Layout() {
           <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center">
             <Shield className="w-4 h-4 text-primary" />
           </div>
-          <span className="font-semibold text-sm tracking-wide">PharmaShield</span>
+          <span className="font-semibold text-sm tracking-wide">ShockMap</span>
         </div>
 
         <nav className="flex-1 py-4 space-y-0.5 px-2">

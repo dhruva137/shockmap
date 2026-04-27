@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: pharmashield-api
+    name: shockmap-api
     env: docker
     region: singapore
     plan: free
