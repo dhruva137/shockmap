@@ -166,20 +166,28 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"GNN loading failed: {e}")
 
-    # Start Background Shock Detector if enabled
-    if settings.DEMO_MODE:
-        # In demo mode, we still run once to get any available live data to complement scenarios
-        from ..ingestion.shock_detector import run_once
-        loop = asyncio.get_event_loop()
-        loop.run_in_executor(None, run_once)
-        logger.info("Background detector triggered once (Demo Mode).")
-    else:
-        from ..ingestion.shock_detector import run_scheduler
-        import threading
-        thread = threading.Thread(target=run_scheduler, daemon=True)
-        thread.start()
-        logger.info("Background detector thread started (Live Mode).")
-        
+    # Start Background Shock Detector — optional; never crash the server if unavailable
+    try:
+        import sys, os
+        # Ensure the project root is on sys.path so 'ingestion' is importable
+        project_root = str(Path(__file__).resolve().parent.parent.parent)
+        if project_root not in sys.path:
+            sys.path.insert(0, project_root)
+
+        if settings.DEMO_MODE:
+            from ingestion.shock_detector import run_once
+            loop = asyncio.get_event_loop()
+            loop.run_in_executor(None, run_once)
+            logger.info("Background detector triggered once (Demo Mode).")
+        else:
+            from ingestion.shock_detector import run_scheduler
+            import threading
+            thread = threading.Thread(target=run_scheduler, daemon=True)
+            thread.start()
+            logger.info("Background detector thread started (Live Mode).")
+    except Exception as e:
+        logger.warning(f"Shock detector could not start (non-fatal): {e}")
+
     logger.info("PharmaShield startup sequence complete.")
 
 @app.exception_handler(Exception)
