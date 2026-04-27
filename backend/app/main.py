@@ -209,7 +209,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 @app.get("/")
 async def root():
     """Root endpoint info."""
-    return {"name": "PharmaShield API", "docs": "/docs"}
+    return {"name": "ShockMap API", "docs": "/docs"}
 
 @app.get("/healthz")
 async def healthz():
