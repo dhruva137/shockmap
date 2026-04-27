@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { api } from '../api/client';
 
 const SEVERITIES = [
@@ -331,8 +332,88 @@ export default function Simulate() {
               </div>
             </div>
           )}
+
+          {/* Risk Visualization Charts */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            {/* Risk Progression Over Time */}
+            <div className="card" style={{ padding: '20px 22px' }}>
+              <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'block', marginBottom: 14 }}>
+                📈 Risk Progression
+              </span>
+              <ResponsiveContainer width="100%" height={240}>
+                <LineChart data={generateRiskProgression(duration, affectedWithPR)}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                  <XAxis dataKey="day" stroke="var(--muted)" style={{ fontSize: '0.7rem' }} />
+                  <YAxis stroke="var(--muted)" style={{ fontSize: '0.7rem' }} />
+                  <Tooltip contentStyle={{ background: 'rgba(13,17,23,0.92)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }} />
+                  <Line type="monotone" dataKey="risk" stroke="#f59e0b" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Top Affected Drugs */}
+            <div className="card" style={{ padding: '20px 22px' }}>
+              <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'block', marginBottom: 14 }}>
+                🔴 Top Affected Drugs
+              </span>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={affectedWithPR.slice(0, 5)}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                  <XAxis dataKey="name" stroke="var(--muted)" style={{ fontSize: '0.65rem' }} angle={-45} textAnchor="end" height={80} />
+                  <YAxis stroke="var(--muted)" style={{ fontSize: '0.7rem' }} />
+                  <Tooltip contentStyle={{ background: 'rgba(13,17,23,0.92)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }} />
+                  <Bar dataKey="risk" fill="#f43f5e" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Supply Concentration Impact */}
+          <div className="card" style={{ padding: '20px 22px' }}>
+            <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'block', marginBottom: 14 }}>
+              📊 Impact Summary
+            </span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
+              <div style={{ padding: '14px', background: 'var(--surface2)', borderRadius: 10 }}>
+                <p style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: 4 }}>Avg Risk Score</p>
+                <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#f59e0b' }}>
+                  {(affectedWithPR.reduce((s, d) => s + d.risk, 0) / affectedWithPR.length || 0).toFixed(0)}%
+                </p>
+              </div>
+              <div style={{ padding: '14px', background: 'var(--surface2)', borderRadius: 10 }}>
+                <p style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: 4 }}>Affected Inputs</p>
+                <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#f43f5e' }}>
+                  {affectedWithPR.length}
+                </p>
+              </div>
+              <div style={{ padding: '14px', background: 'var(--surface2)', borderRadius: 10 }}>
+                <p style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: 4 }}>Duration Factor</p>
+                <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#60a5fa' }}>
+                  {(duration / 30).toFixed(2)}x
+                </p>
+              </div>
+              <div style={{ padding: '14px', background: 'var(--surface2)', borderRadius: 10 }}>
+                <p style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: 4 }}>Critical Risks (≥75%)</p>
+                <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#f43f5e' }}>
+                  {affectedWithPR.filter(d => d.risk >= 75).length}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
+}
+
+function generateRiskProgression(duration, affectedDrugs) {
+  const data = [];
+  for (let day = 0; day <= Math.min(duration, 90); day += Math.ceil(duration / 10)) {
+    const riskFactor = Math.pow(day / 30, 0.8);
+    const risk = affectedDrugs.length > 0
+      ? (affectedDrugs.reduce((s, d) => s + d.risk, 0) / affectedDrugs.length) * Math.min(100, riskFactor * 100)
+      : 0;
+    data.push({ day, risk });
+  }
+  return data.length === 0 ? [{ day: 0, risk: 0 }] : data;
 }

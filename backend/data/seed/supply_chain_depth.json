@@ -1,0 +1,118 @@
+{
+  "provinces": {
+    "Jiangsu": {
+      "name": "Jiangsu",
+      "region": "china",
+      "latitude": 32.0603,
+      "longitude": 118.7969,
+      "key_drugs": ["paracetamol", "amoxicillin", "metformin"],
+      "key_vendors": [
+        {
+          "id": "jiangsu_chem_1",
+          "name": "Jiangsu Pharma Chemical Co.",
+          "drugs_supplied": ["paracetamol", "ibuprofen"],
+          "monthly_capacity_tons": 450,
+          "backup_suppliers": 1,
+          "lead_time_days": 45,
+          "concentration_risk": 0.65
+        },
+        {
+          "id": "jiangsu_api_2",
+          "name": "Jiangsu Advanced Pharma Inc.",
+          "drugs_supplied": ["metformin", "atorvastatin"],
+          "monthly_capacity_tons": 320,
+          "backup_suppliers": 2,
+          "lead_time_days": 38,
+          "concentration_risk": 0.52
+        }
+      ],
+      "imports_monthly_value_usd_millions": 2100,
+      "stockpile_buffer_days": 14,
+      "supply_concentration_index": 0.68,
+      "diversification_score": 0.42,
+      "recent_disruptions": 2,
+      "geopolitical_risk": 0.58
+    },
+    "Guangdong": {
+      "name": "Guangdong",
+      "region": "china",
+      "latitude": 23.3790,
+      "longitude": 113.7633,
+      "key_drugs": ["amoxicillin", "ciprofloxacin", "metoprolol"],
+      "key_vendors": [
+        {
+          "id": "gd_chem_1",
+          "name": "Guangdong Rare Earth Processing",
+          "drugs_supplied": ["rare_earth_compounds"],
+          "monthly_capacity_tons": 580,
+          "backup_suppliers": 0,
+          "lead_time_days": 60,
+          "concentration_risk": 0.89
+        },
+        {
+          "id": "gd_bio_2",
+          "name": "Guangdong Bio-Synthesis Ltd.",
+          "drugs_supplied": ["ciprofloxacin", "amoxicillin"],
+          "monthly_capacity_tons": 280,
+          "backup_suppliers": 1,
+          "lead_time_days": 42,
+          "concentration_risk": 0.61
+        }
+      ],
+      "imports_monthly_value_usd_millions": 1850,
+      "stockpile_buffer_days": 10,
+      "supply_concentration_index": 0.74,
+      "diversification_score": 0.38,
+      "recent_disruptions": 3,
+      "geopolitical_risk": 0.64
+    },
+    "Inner Mongolia": {
+      "name": "Inner Mongolia",
+      "region": "china",
+      "latitude": 40.8175,
+      "longitude": 111.7652,
+      "key_drugs": ["lanthanum_compounds", "neodymium_compounds"],
+      "key_vendors": [
+        {
+          "id": "nm_rare_1",
+          "name": "Inner Mongolia Rare Earth Group",
+          "drugs_supplied": ["rare_earth_elements"],
+          "monthly_capacity_tons": 1200,
+          "backup_suppliers": 0,
+          "lead_time_days": 75,
+          "concentration_risk": 0.92
+        }
+      ],
+      "imports_monthly_value_usd_millions": 950,
+      "stockpile_buffer_days": 8,
+      "supply_concentration_index": 0.85,
+      "diversification_score": 0.20,
+      "recent_disruptions": 1,
+      "geopolitical_risk": 0.71
+    },
+    "Maharashtra": {
+      "name": "Maharashtra",
+      "region": "india",
+      "latitude": 19.7515,
+      "longitude": 75.7139,
+      "key_drugs": ["paracetamol", "amoxicillin", "metformin"],
+      "key_vendors": [
+        {
+          "id": "mh_pharma_1",
+          "name": "Maharashtra Pharma Ltd.",
+          "drugs_supplied": ["paracetamol", "ibuprofen"],
+          "monthly_capacity_tons": 200,
+          "backup_suppliers": 3,
+          "lead_time_days": 7,
+          "concentration_risk": 0.35
+        }
+      ],
+      "imports_monthly_value_usd_millions": 580,
+      "stockpile_buffer_days": 28,
+      "supply_concentration_index": 0.42,
+      "diversification_score": 0.78,
+      "recent_disruptions": 0,
+      "geopolitical_risk": 0.15
+    }
+  }
+}

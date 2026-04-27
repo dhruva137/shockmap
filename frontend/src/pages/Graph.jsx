@@ -275,21 +275,55 @@ export default function Graph() {
   const highRiskCount = allNodes.filter((node) => Number(node.attributes?.current_risk || 0) >= 70).length;
 
   return (
-    <div style={{ padding: '28px 32px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 22 }}>
-        <div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 8 }}>
-            <h1 style={{ fontSize: '1.34rem', fontWeight: 700, letterSpacing: '-0.03em' }}>Propagation Graph</h1>
-            <span className="graph-chip is-active">{activeMode}</span>
-            <span className="graph-chip">{feedLabel}</span>
-            <span className="graph-chip">{engines?.engine_2?.community_detection_method || 'louvain'}</span>
-          </div>
-          <p style={{ fontSize: '0.82rem', color: 'var(--muted)', maxWidth: 780, lineHeight: 1.6 }}>
-            Explore how source provinces, APIs, and downstream drugs connect. Selecting a node lights up its active dependency
-            corridor, reveals why its risk is elevated, and surfaces the state exposure it contributes to.
-          </p>
+    <div style={{ padding: '24px 32px' }}>
+      {/* ── Header ── */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <h1 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)', margin: 0 }}>
+            Propagation Graph
+          </h1>
+          {/* Engine 2 mode */}
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '2px 8px', borderRadius: 4,
+            background: 'rgba(59,130,246,0.1)', color: 'var(--primary)',
+            border: '1px solid rgba(59,130,246,0.2)',
+            fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.07em',
+            textTransform: 'uppercase', fontFamily: 'var(--mono)',
+          }}>
+            ENGINE-2 · {(activeMode || 'pagerank').toUpperCase()}
+          </span>
+          {/* Feed status */}
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '2px 8px', borderRadius: 4,
+            background: feedLabel === 'Live feed' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
+            color: feedLabel === 'Live feed' ? 'var(--green)' : 'var(--amber)',
+            border: `1px solid ${feedLabel === 'Live feed' ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)'}`,
+            fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.07em',
+            textTransform: 'uppercase', fontFamily: 'var(--mono)',
+          }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: feedLabel === 'Live feed' ? 'var(--green)' : 'var(--amber)', flexShrink: 0 }} />
+            {feedLabel.toUpperCase()}
+          </span>
+          {/* Community method */}
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '2px 8px', borderRadius: 4,
+            background: 'rgba(139,92,246,0.1)', color: 'var(--purple)',
+            border: '1px solid rgba(139,92,246,0.2)',
+            fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.07em',
+            textTransform: 'uppercase', fontFamily: 'var(--mono)',
+          }}>
+            {(engines?.engine_2?.community_detection_method || 'LOUVAIN').toUpperCase()}
+            &nbsp;·&nbsp;{communitiesDetected} CLUSTERS
+          </span>
         </div>
+        <p style={{ fontSize: '0.78rem', color: 'var(--muted)', maxWidth: 680, lineHeight: 1.65, margin: 0 }}>
+          Supply chain dependency network. Click a node to trace its upstream sources and downstream drug exposure across India.
+        </p>
       </div>
+
 
       <div className="graph-summary-grid">
         <SummaryMetric label="Active nodes" value={allNodes.length} sub={`${visibleNodes.length} in current view`} />

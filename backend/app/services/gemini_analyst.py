@@ -140,6 +140,7 @@ class GeminiAnalyst:
         self.graph_service = graph_service
         self.data_loader = data_loader
         self.demo_mode_service = demo_mode_service
+        self.genai = genai
         self.gemini_client = gemini_client or GeminiFlashClient(
             genai=genai,
             model_name=settings.GEMINI_FLASH_MODEL,

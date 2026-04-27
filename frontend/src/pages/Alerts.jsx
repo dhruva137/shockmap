@@ -1,11 +1,12 @@
 /* Alerts / Live Shocks page — aggregated GDELT feed */
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 
 const SEV_COLOR = { CRITICAL: '#f43f5e', HIGH: '#f59e0b', MEDIUM: '#60a5fa', LOW: '#6b7280' };
 
 export default function Alerts() {
+  const navigate = useNavigate();
   const [shocks, setShocks]     = useState([]);
   const [alerts, setAlerts]     = useState([]);
   const [health, setHealth]     = useState(null);
@@ -13,6 +14,8 @@ export default function Alerts() {
   const [secFilter, setSecFilter] = useState('all');
   const [loading, setLoading]   = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo]     = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -32,7 +35,18 @@ export default function Alerts() {
 
   const filtered = shocks
     .filter(s => filter === 'all' || s.severity === filter)
-    .filter(s => secFilter === 'all' || s.sector === secFilter);
+    .filter(s => secFilter === 'all' || s.sector === secFilter)
+    .filter(s => {
+      if (!dateFrom && !dateTo) return true;
+      const shockDate = new Date(s.detected_at);
+      if (dateFrom && new Date(dateFrom) > shockDate) return false;
+      if (dateTo) {
+        const endOfDay = new Date(dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        if (endOfDay < shockDate) return false;
+      }
+      return true;
+    });
   const isHybridFeed = health?.shock_feed_mode === 'hybrid_demo_live';
   const isDemoOnly = health?.shock_feed_mode === 'demo';
   const feedLabel = isHybridFeed
@@ -46,8 +60,9 @@ export default function Alerts() {
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: '1.3rem', fontWeight: 700, letterSpacing: '-0.03em', marginBottom: 4 }}>Live Shock Events</h1>
         <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
-          {feedLabel} | {shocks.length} events in view
+          {feedLabel} | {filtered.length} of {shocks.length} events in view
           {lastUpdated ? ` | Last updated ${lastUpdated.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : ''}
+          {(dateFrom || dateTo) && ` | Date filter: ${dateFrom ? new Date(dateFrom).toLocaleDateString('en-IN') : '–'} to ${dateTo ? new Date(dateTo).toLocaleDateString('en-IN') : '–'}`}
         </p>
       </div>
 
@@ -75,6 +90,46 @@ export default function Alerts() {
             </button>
           ))}
         </div>
+
+        {/* Date Range Picker */}
+        <div style={{ display: 'flex', gap: 6, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 6, alignItems: 'center' }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--muted)', marginRight: 4 }}>From:</label>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            style={{
+              padding: '4px 8px', borderRadius: 6, border: '1px solid var(--border)',
+              background: 'var(--surface2)', color: 'var(--text)', fontSize: '0.75rem',
+              fontFamily: 'inherit', cursor: 'pointer',
+            }}
+          />
+          <label style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--muted)', margin: '0 4px 0 10px' }}>To:</label>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            style={{
+              padding: '4px 8px', borderRadius: 6, border: '1px solid var(--border)',
+              background: 'var(--surface2)', color: 'var(--text)', fontSize: '0.75rem',
+              fontFamily: 'inherit', cursor: 'pointer',
+            }}
+          />
+          {(dateFrom || dateTo) && (
+            <button
+              onClick={() => { setDateFrom(''); setDateTo(''); }}
+              style={{
+                marginLeft: 8, padding: '3px 10px', borderRadius: 6, border: 'none',
+                background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '0.7rem',
+                fontWeight: 500, cursor: 'pointer', transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -90,52 +145,53 @@ export default function Alerts() {
           {filtered.map(s => {
             const color = SEV_COLOR[s.severity] || '#6b7280';
             return (
-              <Link key={s.id} to={`/shocks/${s.id}`} style={{ textDecoration: 'none' }}>
-                <div style={{
+              <div
+                key={s.id}
+                onClick={() => navigate(`/shocks/${s.id}`)}
+                style={{
                   background: 'var(--surface)', border: `1px solid ${color}25`,
                   borderLeft: `3px solid ${color}`, borderRadius: 12,
-                  padding: '14px 18px', transition: 'all 0.2s',
+                  padding: '14px 18px', transition: 'all 0.2s', cursor: 'pointer',
                   display: 'flex', alignItems: 'flex-start', gap: 16,
                 }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'var(--surface2)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'var(--surface)'}
-                >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.severity}</span>
-                      <span style={{ fontSize: '0.62rem', fontWeight: 700, color: s.data_mode === 'demo' ? 'var(--primary)' : 'var(--green)', background: s.data_mode === 'demo' ? 'rgba(79,156,249,0.08)' : 'rgba(16,185,129,0.08)', border: s.data_mode === 'demo' ? '1px solid rgba(79,156,249,0.2)' : '1px solid rgba(16,185,129,0.2)', borderRadius: 999, padding: '2px 8px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                        {s.data_mode === 'demo' ? 'SCENARIO' : 'LIVE'}
-                      </span>
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--surface2)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--surface)'}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.severity}</span>
+                    <span style={{ fontSize: '0.62rem', fontWeight: 700, color: s.data_mode === 'demo' ? 'var(--primary)' : 'var(--green)', background: s.data_mode === 'demo' ? 'rgba(59,130,246,0.08)' : 'rgba(16,185,129,0.08)', border: s.data_mode === 'demo' ? '1px solid rgba(59,130,246,0.2)' : '1px solid rgba(16,185,129,0.2)', borderRadius: 4, padding: '2px 7px', letterSpacing: '0.05em', textTransform: 'uppercase', fontFamily: 'var(--mono)' }}>
+                      {s.data_mode === 'demo' ? 'SCENARIO' : 'LIVE'}
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>|</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
+                      {s.sector === 'rare_earth' ? 'Rare Earths' : 'Pharma'}
+                    </span>
+                    {s.province && <>
                       <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>|</span>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
-                        {s.sector === 'rare_earth' ? 'Rare Earths' : 'Pharma'}
-                      </span>
-                      {s.province && <>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>|</span>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{s.province}</span>
-                      </>}
-                    </div>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text)', lineHeight: 1.4 }}>{s.title}</p>
-                    {s.source_url && (
-                      <a
-                        href={s.source_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{ fontSize: '0.72rem', color: 'var(--primary)', textDecoration: 'none' }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Source {'->'}
-                      </a>
-                    )}
+                      <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{s.province}</span>
+                    </>}
                   </div>
-                  <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                    <p style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>
-                      {new Date(s.detected_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                    <p style={{ fontSize: '0.68rem', color: 'var(--muted)', marginTop: 3 }}>{s.source}</p>
-                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text)', lineHeight: 1.4, marginBottom: s.source_url ? 6 : 0 }}>{s.title}</p>
+                  {s.source_url && (
+                    <a
+                      href={s.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ fontSize: '0.7rem', color: 'var(--primary)', textDecoration: 'none', fontFamily: 'var(--mono)' }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      SOURCE →
+                    </a>
+                  )}
                 </div>
-              </Link>
+                <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>
+                    {new Date(s.detected_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                  <p style={{ fontSize: '0.68rem', color: 'var(--muted)', marginTop: 3 }}>{s.source}</p>
+                </div>
+              </div>
             );
           })}
         </div>

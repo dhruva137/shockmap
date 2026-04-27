@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, useMap } from 'react-leaflet';
+import { useNavigate } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import { api } from '../api/client';
 import MapFilterPanel from '../components/MapFilterPanel';
@@ -45,7 +46,20 @@ const REGION_CENTERS = {
   all: { center: [28, 90], zoom: 4 },
   china: { center: [35.86, 104.2], zoom: 4 },
   india: { center: [22, 78.9], zoom: 5 },
+  global: { center: [20, 50], zoom: 3 },
 };
+
+// International supplier nodes → India
+const INTL_NODES = [
+  { id:'usa',         name:'United States', lat:37.09, lng:-95.71, flag:'🇺🇸', color:'#38bdf8', risk:35, exports:['Specialty APIs','Advanced formulations'], value:580 },
+  { id:'germany',     name:'Germany',       lat:51.16, lng:10.45,  flag:'🇩🇪', color:'#a78bfa', risk:28, exports:['RE processing','Catalysts'],             value:310 },
+  { id:'vietnam',     name:'Vietnam',       lat:14.05, lng:108.27, flag:'🇻🇳', color:'#34d399', risk:52, exports:['Generic APIs','Intermediates'],         value:420 },
+  { id:'indonesia',   name:'Indonesia',     lat:-0.78, lng:113.92, flag:'🇮🇩', color:'#f59e0b', risk:61, exports:['Nickel ore','RE minerals'],            value:650 },
+  { id:'singapore',   name:'Singapore',     lat:1.35,  lng:103.81, flag:'🇸🇬', color:'#f472b6', risk:22, exports:['Logistics hub','API transit'],         value:290 },
+  { id:'netherlands', name:'Netherlands',   lat:52.13, lng:5.29,   flag:'🇳🇱', color:'#60a5fa', risk:30, exports:['API ingredients','Lab chemicals'],     value:240 },
+];
+const INDIA_LAT = 20.59;
+const INDIA_LNG = 78.96;
 
 // ─── Stat Card ───────────────────────────────────────────────────────────
 function StatCard({ icon, value, label, color }) {
@@ -157,6 +171,72 @@ function ProvinceDetail({ detail, onClose }) {
         </div>
       )}
 
+      {/* Supply Chain Depth */}
+      {detail.key_vendors && detail.key_vendors.length > 0 && (
+        <div>
+          <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            🏭 Key Vendors ({detail.key_vendors.length})
+          </div>
+          {detail.key_vendors.slice(0, 3).map((v, i) => (
+            <div key={i} style={{
+              fontSize: '0.7rem', padding: '8px 10px', borderRadius: 8,
+              background: 'var(--surface2)', border: '1px solid var(--border)',
+              marginBottom: 6, lineHeight: 1.5,
+            }}>
+              <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: 3 }}>
+                {v.name}
+              </div>
+              <div style={{ color: 'var(--muted)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                <span>Capacity: {v.monthly_capacity_tons}t/mo</span>
+                <span>Lead time: {v.lead_time_days}d</span>
+                <span>Backup suppliers: {v.backup_suppliers}</span>
+                <span style={{ color: v.concentration_risk > 0.7 ? '#f43f5e' : 'var(--muted)' }}>
+                  Concentration: {(v.concentration_risk * 100).toFixed(0)}%
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Supply Concentration Metrics */}
+      {detail.supply_concentration_index !== undefined && (
+        <div>
+          <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            📊 Supply Metrics
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <div style={{ padding: '8px 10px', borderRadius: 8, background: 'var(--surface2)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--muted)', marginBottom: 3 }}>Concentration Index</div>
+              <div style={{
+                fontSize: '0.95rem', fontWeight: 700,
+                color: detail.supply_concentration_index > 0.7 ? '#f43f5e' : detail.supply_concentration_index > 0.5 ? '#f59e0b' : '#10b981'
+              }}>
+                {(detail.supply_concentration_index * 100).toFixed(0)}%
+              </div>
+            </div>
+            <div style={{ padding: '8px 10px', borderRadius: 8, background: 'var(--surface2)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--muted)', marginBottom: 3 }}>Diversification</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#10b981' }}>
+                {(detail.diversification_score * 100).toFixed(0)}%
+              </div>
+            </div>
+            <div style={{ padding: '8px 10px', borderRadius: 8, background: 'var(--surface2)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--muted)', marginBottom: 3 }}>Buffer Days</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 700, color: detail.stockpile_buffer_days < 14 ? '#f59e0b' : '#10b981' }}>
+                {detail.stockpile_buffer_days}d
+              </div>
+            </div>
+            <div style={{ padding: '8px 10px', borderRadius: 8, background: 'var(--surface2)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--muted)', marginBottom: 3 }}>Recent Events</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 700, color: detail.recent_disruptions > 0 ? '#f43f5e' : '#10b981' }}>
+                {detail.recent_disruptions}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Entities */}
       {detail.top_entities?.length > 0 && (
         <div>
@@ -234,14 +314,19 @@ function MapLegend() {
 
 // ─── Main Map Component ──────────────────────────────────────────────────
 export default function MapView() {
+  const navigate = useNavigate();
   const [heatmap, setHeatmap] = useState({ points: [] });
+
   const [corridors, setCorridors] = useState({ corridors: [] });
   const [stats, setStats] = useState(null);
   const [filters, setFilters] = useState({ sector: 'both', risk_min: 0, shock_type: '', region: 'all' });
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [provinceDetail, setProvinceDetail] = useState(null);
   const [showCorridors, setShowCorridors] = useState(false);
+  const [showIntl, setShowIntl] = useState(true);
+  const [showHeat, setShowHeat] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [activeLayer, setActiveLayer] = useState('both');
   const debounceRef = useRef(null);
 
   const regionConf = REGION_CENTERS[filters.region] || REGION_CENTERS.all;
@@ -320,12 +405,84 @@ export default function MapView() {
           </div>
         )}
 
-        {/* Filter Panel */}
-        <MapFilterPanel
-          onFilterChange={setFilters}
-          showCorridors={showCorridors}
-          onToggleCorridors={() => setShowCorridors(v => !v)}
-        />
+        {/* Layer Toggles */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Map Layers</div>
+          {[
+            { label: '🇮🇳 China Provinces', key: 'china', color: '#f43f5e' },
+            { label: '🇮🇳 India States',    key: 'india', color: '#60a5fa' },
+          ].map(l => (
+            <button key={l.key}
+              onClick={() => setActiveLayer(a => a === l.key ? 'both' : l.key)}
+              style={{
+                display: 'block', width: '100%', padding: '7px 10px', marginBottom: 6,
+                borderRadius: 7, border: '1px solid',
+                borderColor: (activeLayer === l.key || activeLayer === 'both') ? l.color + '60' : 'var(--border2)',
+                background: (activeLayer === l.key || activeLayer === 'both') ? l.color + '12' : 'transparent',
+                color: (activeLayer === l.key || activeLayer === 'both') ? l.color : 'var(--muted)',
+                fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
+              }}
+            >{l.label}</button>
+          ))}
+          <div style={{ width: '100%', height: 1, background: 'var(--border)', margin: '8px 0' }} />
+          {[
+            { label: '🌐 International Nodes', state: showIntl, set: setShowIntl, color: '#a78bfa' },
+            { label: '⛓ Supply Corridors',     state: showCorridors, set: setShowCorridors, color: '#8b5cf6' },
+          ].map(l => (
+            <button key={l.label} onClick={() => l.set(v => !v)} style={{
+              display: 'block', width: '100%', padding: '7px 10px', marginBottom: 6,
+              borderRadius: 7, border: '1px solid',
+              borderColor: l.state ? l.color + '60' : 'var(--border2)',
+              background: l.state ? l.color + '12' : 'transparent',
+              color: l.state ? l.color : 'var(--muted)',
+              fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
+            }}>{l.label}</button>
+          ))}
+        </div>
+
+        {/* Region Quick-Jump */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Region</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            {['all','china','india','global'].map(r => (
+              <button key={r}
+                onClick={() => setFilters(f => ({ ...f, region: r }))}
+                style={{
+                  padding: '7px 6px', borderRadius: 7, border: '1px solid',
+                  borderColor: filters.region === r ? 'var(--primary)' : 'var(--border2)',
+                  background: filters.region === r ? 'rgba(79,156,249,0.1)' : 'transparent',
+                  color: filters.region === r ? 'var(--primary)' : 'var(--muted)',
+                  fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.15s',
+                }}
+              >{r}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* Risk Filter */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Min Risk Threshold</div>
+          <input type="range" min={0} max={80} step={5} value={filters.risk_min}
+            onChange={e => setFilters(f => ({ ...f, risk_min: Number(e.target.value) }))}
+            style={{ width: '100%', accentColor: 'var(--primary)' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: 'var(--muted)', marginTop: 4 }}>
+            <span>0 (all)</span><span style={{ color: 'var(--text)', fontWeight: 700 }}>{filters.risk_min}+</span><span>80 (critical)</span>
+          </div>
+        </div>
+
+        {/* India deep dive button */}
+        <button onClick={() => navigate('/india')} style={{
+          width: '100%', padding: '10px', background: 'rgba(56,189,248,0.1)',
+          color: '#38bdf8', border: '1px solid rgba(56,189,248,0.3)', borderRadius: 10,
+          fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
+        }}>🇮🇳 India In-Depth View</button>
+
+        <button onClick={() => navigate('/backtest')} style={{
+          width: '100%', padding: '10px', background: 'rgba(167,139,250,0.1)',
+          color: '#a78bfa', border: '1px solid rgba(167,139,250,0.3)', borderRadius: 10,
+          fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
+        }}>⏪ COVID Backtest Demo</button>
 
         {/* Province Detail */}
         <ProvinceDetail detail={provinceDetail} onClose={() => setSelectedProvince(null)} />
@@ -403,8 +560,63 @@ export default function MapView() {
             );
           })}
 
+          {/* International Nodes + their corridors to India */}
+          {showIntl && INTL_NODES.map(n => (
+            <React.Fragment key={n.id}>
+              {/* Line to India */}
+              <Polyline
+                positions={[[n.lat, n.lng], [INDIA_LAT, INDIA_LNG]]}
+                pathOptions={{
+                  color: n.color + '60',
+                  weight: Math.max(1, Math.min(4, n.value / 200)),
+                  dashArray: '5, 8',
+                  className: 'animated-polyline',
+                }}
+              >
+                <Popup>
+                  <div style={{ minWidth: 160 }}>
+                    <strong style={{ fontSize: '0.85rem' }}>{n.flag} {n.name} → 🇮🇳 India</strong>
+                    <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 6 }}>
+                      ${n.value}M annual exports · Risk: <strong style={{ color: n.color }}>{n.risk}%</strong>
+                    </div>
+                    <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                      {n.exports.map(e => <span key={e} style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#1e293b', border: '1px solid #334155' }}>{e}</span>)}
+                    </div>
+                  </div>
+                </Popup>
+              </Polyline>
+              {/* Node marker */}
+              <CircleMarker
+                center={[n.lat, n.lng]}
+                radius={9 + n.value / 130}
+                pathOptions={{
+                  color: n.color,
+                  fillColor: n.color,
+                  fillOpacity: 0.5,
+                  weight: 2,
+                }}
+              >
+                <Popup>
+                  <div style={{ minWidth: 160 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                      <span style={{ fontSize: '1.2rem' }}>{n.flag}</span>
+                      <strong style={{ fontSize: '0.9rem', color: n.color }}>{n.name}</strong>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: 6 }}>
+                      Export value: <strong style={{ color: '#e8eaf0' }}>${n.value}M/yr</strong>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 6 }}>
+                      Supply risk: <strong style={{ color: n.color }}>{n.risk}%</strong>
+                    </div>
+                    {n.exports.map(e => <div key={e} style={{ fontSize: '0.68rem', padding: '3px 6px', borderRadius: 4, background: '#1e293b', marginBottom: 3 }}>📦 {e}</div>)}
+                  </div>
+                </Popup>
+              </CircleMarker>
+            </React.Fragment>
+          ))}
+
           {/* China Province Markers */}
-          {chinaPoints.map(p => {
+          {(activeLayer === 'china' || activeLayer === 'both') && chinaPoints.map(p => {
             const color = getRiskColor(p.risk_score);
             const radius = Math.max(8, Math.min(28, p.risk_score / 3.5));
             const isShocked = p.shock_count > 0;
@@ -416,8 +628,8 @@ export default function MapView() {
                 pathOptions={{
                   color: isShocked ? '#f43f5e' : color,
                   fillColor: color,
-                  fillOpacity: isShocked ? 0.7 : 0.35,
-                  weight: isShocked ? 2.5 : 1,
+                  fillOpacity: isShocked ? 0.7 : 0.45,
+                  weight: isShocked ? 2.5 : 1.5,
                 }}
                 eventHandlers={{ click: () => setSelectedProvince(p.id) }}
               >
@@ -428,7 +640,7 @@ export default function MapView() {
                       <strong style={{ fontSize: '0.9rem' }}>{p.name}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: 4 }}>
-                      <span style={{ color: '#9ca3af' }}>Risk:</span>
+                      <span style={{ color: '#9ca3af' }}>Risk Score:</span>
                       <strong style={{ color }}>{p.risk_score.toFixed(1)}</strong>
                     </div>
                     {isShocked && (
@@ -436,13 +648,13 @@ export default function MapView() {
                         ⚠ {p.shock_count} Active Shock{p.shock_count > 1 ? 's' : ''}
                       </div>
                     )}
-                    <button
-                      onClick={() => setSelectedProvince(p.id)}
-                      style={{
-                        width: '100%', padding: 5, marginTop: 6,
-                        background: '#4f9cf9', color: '#fff', border: 'none',
-                        borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
-                      }}
+                    {p.top_affected_inputs?.length > 0 && (
+                      <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginBottom: 6 }}>
+                        Affects: {p.top_affected_inputs.slice(0, 3).join(', ')}
+                      </div>
+                    )}
+                    <button onClick={() => setSelectedProvince(p.id)}
+                      style={{ width: '100%', padding: 5, marginTop: 6, background: '#4f9cf9', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
                     >View Details</button>
                   </div>
                 </Popup>
@@ -451,7 +663,7 @@ export default function MapView() {
           })}
 
           {/* India State Markers */}
-          {indiaPoints.map(p => {
+          {(activeLayer === 'india' || activeLayer === 'both') && indiaPoints.map(p => {
             const color = getRiskColor(p.risk_score);
             const radius = Math.max(7, Math.min(22, p.risk_score / 4));
             return (
@@ -462,7 +674,7 @@ export default function MapView() {
                 pathOptions={{
                   color: `${color}cc`,
                   fillColor: color,
-                  fillOpacity: 0.3,
+                  fillOpacity: 0.35,
                   weight: 1.5,
                   dashArray: '4, 4',
                 }}
@@ -479,17 +691,17 @@ export default function MapView() {
                       <strong style={{ color }}>{p.risk_score.toFixed(1)}</strong>
                     </div>
                     {p.shock_count > 0 && (
-                      <div style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 600 }}>
+                      <div style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 600, marginBottom: 4 }}>
                         📡 {p.shock_count} upstream shock{p.shock_count > 1 ? 's' : ''}
                       </div>
                     )}
-                    <button
-                      onClick={() => setSelectedProvince(p.id)}
-                      style={{
-                        width: '100%', padding: 5, marginTop: 6,
-                        background: '#8b5cf6', color: '#fff', border: 'none',
-                        borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
-                      }}
+                    {p.top_affected_inputs?.length > 0 && (
+                      <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginBottom: 6 }}>
+                        Top inputs: {p.top_affected_inputs.slice(0, 3).join(', ')}
+                      </div>
+                    )}
+                    <button onClick={() => setSelectedProvince(p.id)}
+                      style={{ width: '100%', padding: 5, marginTop: 6, background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
                     >View Details</button>
                   </div>
                 </Popup>

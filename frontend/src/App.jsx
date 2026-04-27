@@ -11,6 +11,8 @@ import Graph from './pages/Graph';
 import Query from './pages/Query';
 import Simulate from './pages/Simulate';
 import MapView from './pages/Map';
+import IndiaInDepth from './pages/IndiaInDepth';
+import CovidBacktest from './pages/CovidBacktest';
 
 export default function App() {
   // Track whether user has selected sectors (persisted in sessionStorage)
@@ -61,6 +63,8 @@ export default function App() {
         <Route path="query"          element={<Query />} />
         <Route path="simulate"       element={<Simulate />} />
         <Route path="map"            element={<MapView />} />
+        <Route path="india"          element={<IndiaInDepth />} />
+        <Route path="backtest"       element={<CovidBacktest />} />
       </Route>
     </Routes>
   );

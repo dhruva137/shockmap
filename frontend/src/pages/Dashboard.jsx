@@ -406,6 +406,99 @@ export default function Dashboard({ sectors = ['pharma', 'rare_earth'] }) {
           </Link>
         </div>
       </div>
+
+      {/* Advanced Supply Chain Metrics */}
+      <div style={{ marginTop: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+        {/* Supply Concentration Index */}
+        <div className="card" style={{ padding: '20px 22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Supply Concentration</span>
+            <span style={{ fontSize: '0.62rem', background: 'rgba(244,114,182,0.12)', color: '#f472b6', border: '1px solid rgba(244,114,182,0.25)', borderRadius: 999, padding: '2px 7px' }}>
+              India
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: 4 }}>Pharma APIs</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: '72%', background: '#f59e0b' }} />
+                </div>
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#f59e0b' }}>72%</span>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: 4 }}>Rare Earths</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: '89%', background: '#f43f5e' }} />
+                </div>
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#f43f5e' }}>89%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Buffer Capacity */}
+        <div className="card" style={{ padding: '20px 22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Stockpile Buffer</span>
+            <span style={{ fontSize: '0.62rem', background: 'rgba(251,191,36,0.12)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 999, padding: '2px 7px' }}>
+              Critical
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>Paracetamol</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#fbbf24' }}>8 days</span>
+              </div>
+              <div style={{ height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: '40%', background: '#fbbf24' }} />
+              </div>
+            </div>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>Neodymium</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#f43f5e' }}>5 days</span>
+              </div>
+              <div style={{ height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: '25%', background: '#f43f5e' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Geopolitical Risk Index */}
+        <div className="card" style={{ padding: '20px 22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Geopolitical Risk</span>
+            <span style={{ fontSize: '0.62rem', background: 'rgba(244,63,94,0.12)', color: '#f43f5e', border: '1px solid rgba(244,63,94,0.25)', borderRadius: 999, padding: '2px 7px' }}>
+              High
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>China-Rare Earths</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#f43f5e' }}>7.8/10</span>
+              </div>
+              <div style={{ height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: '78%', background: '#f43f5e' }} />
+              </div>
+            </div>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>USA-Pharma APIs</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#60a5fa' }}>3.2/10</span>
+              </div>
+              <div style={{ height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: '32%', background: '#60a5fa' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

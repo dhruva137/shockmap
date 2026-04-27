@@ -202,7 +202,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={
             "error": "internal",
             "request_id": request_id,
-            "message": "An unexpected error occurred."
+            "message": f"An unexpected error occurred: {exc}\n{traceback.format_exc()}"
         }
     )
 

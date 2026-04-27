@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     SEED_DATA_DIR: str = str(BASE_DIR / "data" / "seed")
     GNN_WEIGHTS_PATH: str = str(BASE_DIR / "ml" / "weights" / "gnn_v1.pt")
     ENABLE_GNN: bool = False
-    DEMO_MODE: bool = True
+    DEMO_MODE: bool = False
     DEMO_SCENARIOS_PATH: str = str(BASE_DIR / "data" / "seed" / "demo_scenarios.json")
 
     # Model & Database Configurations

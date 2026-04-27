@@ -1,0 +1,162 @@
+{
+  "international_suppliers": {
+    "USA": {
+      "name": "United States",
+      "latitude": 37.0902,
+      "longitude": -95.7129,
+      "type": "country",
+      "sector": "pharma",
+      "key_exports": ["active_pharma_ingredients", "finished_formulations"],
+      "total_export_value_usd_millions": 580,
+      "risk_level": 0.35,
+      "import_routes": [
+        {
+          "from": "USA",
+          "to": "India",
+          "route_name": "Atlantic-Suez-Indian Ocean",
+          "transit_days": 35,
+          "criticality": 0.45,
+          "main_products": ["specialty_chemicals", "advanced_apis"],
+          "annual_volume_usd_millions": 320
+        }
+      ],
+      "lead_suppliers": [
+        {
+          "id": "usa_pharma_1",
+          "name": "Eli Lilly Manufacturing",
+          "products": ["insulin_analogs", "oncology_drugs"],
+          "capacity_tons_monthly": 280,
+          "reliability": 0.94
+        }
+      ]
+    },
+    "Vietnam": {
+      "name": "Vietnam",
+      "latitude": 14.0583,
+      "longitude": 108.2772,
+      "type": "country",
+      "sector": "pharma",
+      "key_exports": ["generic_apis", "raw_materials"],
+      "total_export_value_usd_millions": 420,
+      "risk_level": 0.52,
+      "import_routes": [
+        {
+          "from": "Vietnam",
+          "to": "India",
+          "route_name": "South China Sea-Andaman Sea",
+          "transit_days": 12,
+          "criticality": 0.38,
+          "main_products": ["generic_apis", "intermediates"],
+          "annual_volume_usd_millions": 240
+        }
+      ],
+      "lead_suppliers": [
+        {
+          "id": "vietnam_pharma_1",
+          "name": "TPP Pharmaceutical",
+          "products": ["paracetamol_precursors", "antibiotic_bases"],
+          "capacity_tons_monthly": 350,
+          "reliability": 0.82
+        }
+      ]
+    },
+    "Germany": {
+      "name": "Germany",
+      "latitude": 51.1657,
+      "longitude": 10.4515,
+      "type": "country",
+      "sector": "rare_earth",
+      "key_exports": ["processing_chemicals", "rare_earth_compounds"],
+      "total_export_value_usd_millions": 310,
+      "risk_level": 0.28,
+      "import_routes": [
+        {
+          "from": "Germany",
+          "to": "India",
+          "route_name": "Atlantic-Suez-Indian Ocean",
+          "transit_days": 42,
+          "criticality": 0.42,
+          "main_products": ["rare_earth_processing", "specialty_chemicals"],
+          "annual_volume_usd_millions": 185
+        }
+      ],
+      "lead_suppliers": [
+        {
+          "id": "germany_chem_1",
+          "name": "Merck KGaA",
+          "products": ["rare_earth_compounds", "catalysts"],
+          "capacity_tons_monthly": 150,
+          "reliability": 0.96
+        }
+      ]
+    },
+    "Indonesia": {
+      "name": "Indonesia",
+      "latitude": -0.7893,
+      "longitude": 113.9213,
+      "type": "country",
+      "sector": "rare_earth",
+      "key_exports": ["rare_earth_minerals", "mineral_concentrates"],
+      "total_export_value_usd_millions": 650,
+      "risk_level": 0.61,
+      "import_routes": [
+        {
+          "from": "Indonesia",
+          "to": "India",
+          "route_name": "Malacca Strait-Indian Ocean",
+          "transit_days": 8,
+          "criticality": 0.58,
+          "main_products": ["nickel_ore", "rare_earth_minerals"],
+          "annual_volume_usd_millions": 420
+        }
+      ],
+      "lead_suppliers": [
+        {
+          "id": "indonesia_mining_1",
+          "name": "PT Vale Indonesia",
+          "products": ["nickel_laterite", "cobalt_compounds"],
+          "capacity_tons_monthly": 800,
+          "reliability": 0.78
+        }
+      ]
+    }
+  },
+  "india_state_connections": {
+    "Maharashtra_to_Gujarat": {
+      "from_state": "Maharashtra",
+      "to_state": "Gujarat",
+      "route_name": "Western Corridor",
+      "transit_days": 2,
+      "main_products": ["paracetamol", "ibuprofen"],
+      "annual_trade_value_usd_millions": 240,
+      "criticality": 0.52
+    },
+    "Maharashtra_to_Karnataka": {
+      "from_state": "Maharashtra",
+      "to_state": "Karnataka",
+      "route_name": "Deccan Route",
+      "transit_days": 3,
+      "main_products": ["metformin", "atorvastatin"],
+      "annual_trade_value_usd_millions": 180,
+      "criticality": 0.45
+    },
+    "Tamil_Nadu_to_Karnataka": {
+      "from_state": "Tamil Nadu",
+      "to_state": "Karnataka",
+      "route_name": "South Corridor",
+      "transit_days": 2,
+      "main_products": ["diclofenac", "aspirin"],
+      "annual_trade_value_usd_millions": 160,
+      "criticality": 0.38
+    },
+    "West_Bengal_to_Delhi": {
+      "from_state": "West Bengal",
+      "to_state": "Delhi",
+      "route_name": "Northern Corridor",
+      "transit_days": 4,
+      "main_products": ["gentamicin", "fluconazole"],
+      "annual_trade_value_usd_millions": 210,
+      "criticality": 0.48
+    }
+  }
+}
