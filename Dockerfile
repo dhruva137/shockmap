@@ -5,12 +5,11 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y gcc g++ && rm -rf /var/lib/apt/lists/*
 
-# Copy backend requirements and install
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the entire project first to avoid path resolution issues in Render's builder
+COPY . /app
 
-# Copy the entire project (backend, ingestion, data, etc.)
-COPY . .
+# Install dependencies from the copied backend folder
+RUN pip install --no-cache-dir -r backend/requirements.txt
 
 # Set environment variables
 ENV PORT=8080
