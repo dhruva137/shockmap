@@ -11,8 +11,8 @@ COPY . /app
 # Install dependencies from the copied backend folder
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
-# Set environment variables
-ENV PORT=8080
+# Set environment variables (7860 is required by Hugging Face Spaces by default)
+ENV PORT=7860
 
 # Run the unified backend application
 CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT}"]
