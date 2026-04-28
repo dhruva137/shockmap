@@ -2,42 +2,42 @@
   {
     "id": "orf_api_dependency_01",
     "source": "ORF - Time to end the battle of Indian pharmaceutical players and Chinese key ingredients",
-    "source_url": "https://www.orfonline.org/expert-speak/time-to-end-the-battle-of-indian-pharmaceutical-players-and-chinese-key-ingredients",
+    "source_url": "https://www.orfonline.org/research/time-to-end-the-battle-of-indian-pharmaceutical-players-and-chinese-key-ingredients",
     "text": "ORF notes that India's formulation strength still sits on top of heavy bulk-drug and API dependence on China, with import exposure often cited in the 65-70% range. That concentration leaves Indian supply vulnerable to price spikes and sudden export or production shocks.",
     "keywords": ["dependency", "API", "China", "import", "vulnerability"]
   },
   {
     "id": "orf_pharma_cluster_02",
     "source": "ORF - Understanding the coming challenges to India's pharma sector",
-    "source_url": "https://www.orfonline.org/expert-speak/understanding-the-coming-challenges-to-indias-pharma-sector-66556",
+    "source_url": "https://www.orfonline.org/research/india-s-rise-as-global-pharmacy-masks-deep-dependence-on-china",
     "text": "ORF highlights that major Chinese raw-material clusters such as Hubei, Zhejiang and Jiangsu are deeply tied to global pharmaceutical supply. Disruption in those manufacturing centres can quickly tighten API availability for Indian producers.",
     "keywords": ["cluster", "Hubei", "Zhejiang", "Jiangsu", "API", "supply shock"]
   },
   {
     "id": "orf_trade_security_03",
     "source": "ORF - Tariffs and Health Security: The Future of US-India Pharma Trade",
-    "source_url": "https://www.orfonline.org/expert-speak/tariffs-and-health-security-the-future-of-us-india-pharma-trade",
+    "source_url": "https://www.orfonline.org/research/chinas-shadow-over-indias-medical-supply-chains",
     "text": "ORF argues that India still imports a large share of its API requirement from China and that trade or production disruptions can undermine health security. The case for de-risking depends on diversifying KSM and API sourcing before the next shock hits.",
     "keywords": ["health security", "API", "trade", "de-risking", "China"]
   },
   {
     "id": "nlem_2022_01",
     "source": "CDSCO - Essential Medicines",
-    "source_url": "https://cdsco.gov.in/opencms/opencms/en/consumer/Essential-Medicines/",
+    "source_url": "https://nhsrcindia.org/national-list-of-essential-medicines-2022",
     "text": "The National List of Essential Medicines is meant to support continuous availability of priority medicines in functioning health systems. Tier 1 medicines should be prioritized for monitoring because stockouts have broad and immediate public-health effects.",
     "keywords": ["NLEM", "essential medicines", "availability", "public health", "tier 1"]
   },
   {
     "id": "nlem_2022_02",
     "source": "CDSCO - National List of Essential Medicines 2022",
-    "source_url": "https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2018/UploadPublic_NoticesFiles/nlem2022.pdf",
+    "source_url": "https://main.mohfw.gov.in/newshighlights-104",
     "text": "NLEM 2022 covers both widely used medicines and specialized therapies where failure of supply still harms care delivery for specific patient groups. Buffer policies and procurement planning should account for Tier 2 and Tier 3 exposure as well, not just the highest-volume products.",
     "keywords": ["NLEM", "tier 2", "tier 3", "buffer stock", "procurement"]
   },
   {
     "id": "niti_pli_01",
     "source": "NITI Aayog - Public Finance and Policy Analysis Division",
-    "source_url": "https://niti.gov.in/divisions/division/public-finance-and-policy-analysis",
+    "source_url": "https://www.niti.gov.in/production-linked-incentive-pli-scheme",
     "text": "NITI Aayog states that it helped shape the contours of the Production Linked Incentive schemes for active pharmaceutical ingredients and other strategic sectors. The policy direction is to build domestic capacity in inputs that create national import vulnerability.",
     "keywords": ["NITI Aayog", "PLI", "API", "domestic manufacturing", "capacity"]
   },

@@ -32,6 +32,11 @@ class SimulationResult(BaseModel):
     affected_drugs: List[Drug] = Field(..., description="List of top 10 drugs most affected by the shock")
     propagation_explanation: str = Field(..., description="AI or rule-based explanation of why these drugs are at risk")
     simulated_at: datetime = Field(default_factory=datetime.utcnow)
+    # Economic impact estimates (USD millions)
+    estimated_stockout_cost_usd_m: float = Field(0.0, description="Estimated cost of stockouts in USD millions")
+    emergency_procurement_cost_usd_m: float = Field(0.0, description="Emergency procurement premium cost in USD millions")
+    total_economic_impact_usd_m: float = Field(0.0, description="Total estimated economic impact in USD millions")
+    cost_by_drug: List[dict] = Field(default_factory=list, description="Per-drug cost breakdown")
 
 
 @router.post("/simulate", response_model=SimulationResult)
@@ -116,8 +121,50 @@ async def post_simulate(
         except Exception as e:
             logger.warning(f"Gemini explanation failed: {e}")
 
+    # 5. Cost Estimation (economic model)
+    # Base annual market values (USD million) by therapeutic class — rough proxies
+    CLASS_VALUE_USD_M = {
+        "antibiotic": 45, "antimicrobial": 45, "anti-infective": 40,
+        "analgesic": 60, "anti-inflammatory": 55, "antipyretic": 50,
+        "antidiabetic": 80, "cardiovascular": 90, "antihypertensive": 85,
+        "anticoagulant": 70, "antihistamine": 30, "antifungal": 35,
+        "antiviral": 65, "oncology": 120, "immunology": 110,
+        "rare earth": 25, "mineral": 20,
+    }
+    SEVERITY_MULTIPLIER = {"warning": 0.15, "partial_shutdown": 0.45, "full_shutdown": 0.85}
+    sev_mult = SEVERITY_MULTIPLIER.get(request.severity, 0.5)
+    duration_factor = min(1.0, request.duration_days / 90)
+    emergency_premium = 0.30  # 30% premium for emergency procurement
+
+    cost_by_drug = []
+    total_stockout = 0.0
+    total_emergency = 0.0
+
+    for drug in hydrated_drugs:
+        tc = (drug.therapeutic_class or "").lower()
+        base_val = next(
+            (v for k, v in CLASS_VALUE_USD_M.items() if k in tc),
+            30.0  # default
+        )
+        risk_factor = (drug.current_risk or 0) / 100.0
+        stockout_cost = base_val * risk_factor * sev_mult * duration_factor
+        emergency_cost = base_val * risk_factor * sev_mult * emergency_premium * duration_factor
+        total_stockout += stockout_cost
+        total_emergency += emergency_cost
+        cost_by_drug.append({
+            "id": drug.id,
+            "name": drug.name,
+            "stockout_cost_usd_m": round(stockout_cost, 2),
+            "emergency_cost_usd_m": round(emergency_cost, 2),
+            "total_cost_usd_m": round(stockout_cost + emergency_cost, 2),
+        })
+
     return SimulationResult(
         affected_drugs=hydrated_drugs,
         propagation_explanation=explanation,
-        simulated_at=datetime.utcnow()
+        simulated_at=datetime.utcnow(),
+        estimated_stockout_cost_usd_m=round(total_stockout, 2),
+        emergency_procurement_cost_usd_m=round(total_emergency, 2),
+        total_economic_impact_usd_m=round(total_stockout + total_emergency, 2),
+        cost_by_drug=cost_by_drug,
     )

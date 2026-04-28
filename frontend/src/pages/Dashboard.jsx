@@ -1,6 +1,6 @@
 /* Main Dashboard — Screen 2 — 3-Engine Architecture */
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 
 const SEV_COLOR = { CRITICAL: '#f43f5e', HIGH: '#f59e0b', MEDIUM: '#60a5fa', LOW: '#6b7280' };
@@ -25,39 +25,53 @@ function RiskBar({ score }) {
 
 function ShockCard({ shock }) {
   const color = SEV_COLOR[shock.severity] || '#6b7280';
+  const severity = shock.severity === 'CRITICAL' ? 'full_shutdown' : shock.severity === 'HIGH' ? 'partial_shutdown' : 'warning';
   return (
-    <Link to={`/shocks/${shock.id}`} style={{ textDecoration: 'none' }}>
-      <div style={{
-        background: 'var(--surface2)', border: `1px solid ${color}30`,
-        borderLeft: `3px solid ${color}`, borderRadius: 12, padding: '14px 16px',
-        cursor: 'pointer', transition: 'all 0.2s',
-      }}
-        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface2)'; e.currentTarget.style.transform = 'none'; }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-          <span style={{ fontSize: '0.72rem', color, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {shock.severity}
-          </span>
-          <span style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>
-            {new Date(shock.detected_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        </div>
-        <p style={{ fontSize: '0.82rem', color: 'var(--text)', lineHeight: 1.4, marginBottom: 6 }}>
+    <div style={{
+      background: 'var(--surface2)', border: `1px solid ${color}30`,
+      borderLeft: `3px solid ${color}`, borderRadius: 10, padding: '14px 16px',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+        <span style={{ fontSize: '0.68rem', color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--mono)' }}>
+          {shock.severity}
+        </span>
+        <span style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>
+          {new Date(shock.detected_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
+      <Link to={`/shocks/${shock.id}`} style={{ textDecoration: 'none' }}>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text)', lineHeight: 1.4, marginBottom: 8 }}>
           {shock.title}
         </p>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {shock.province && (
-            <span style={{ fontSize: '0.68rem', color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 999, padding: '2px 8px' }}>
-              📍 {shock.province}
+            <span style={{ fontSize: '0.65rem', color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 7px', fontFamily: 'var(--mono)' }}>
+              {shock.province}
             </span>
           )}
-          <span style={{ fontSize: '0.68rem', color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 999, padding: '2px 8px' }}>
-            {shock.sector === 'rare_earth' ? '⛏️ Rare Earths' : '💊 Pharma'}
+          <span style={{ fontSize: '0.65rem', color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 7px' }}>
+            {shock.sector === 'rare_earth' ? 'Rare Earths' : 'Pharma'}
           </span>
         </div>
+        {shock.province && (
+          <Link
+            to={`/simulate?province=${encodeURIComponent(shock.province)}&severity=${severity}&duration=30`}
+            style={{
+              fontSize: '0.62rem', fontWeight: 700, color: '#f59e0b',
+              background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)',
+              borderRadius: 4, padding: '3px 8px', textDecoration: 'none',
+              fontFamily: 'var(--mono)', letterSpacing: '0.04em', whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(245,158,11,0.2)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(245,158,11,0.1)'}
+          >
+            SIMULATE
+          </Link>
+        )}
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -364,6 +378,20 @@ export default function Dashboard({ sectors = ['pharma', 'rare_earth'] }) {
                 <span style={{ fontSize: '0.72rem', fontWeight: 600, minWidth: 36, textAlign: 'right', color: p.score >= 0.85 ? 'var(--accent)' : p.score >= 0.7 ? 'var(--amber)' : 'var(--primary)' }}>
                   {p.score.toFixed(2)}
                 </span>
+                <Link
+                  to={`/simulate?province=${encodeURIComponent(p.name)}&severity=partial_shutdown`}
+                  style={{
+                    fontSize: '0.62rem', fontWeight: 700, color: 'var(--primary)',
+                    background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.25)',
+                    borderRadius: 4, padding: '3px 8px', textDecoration: 'none',
+                    fontFamily: 'var(--mono)', letterSpacing: '0.04em', whiteSpace: 'nowrap',
+                    transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(79,156,249,0.2)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(79,156,249,0.1)'}
+                >
+                  RUN IMPACT
+                </Link>
               </div>
             ))}
           </div>

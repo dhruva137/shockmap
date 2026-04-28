@@ -11,64 +11,76 @@ const SEVERITY = {
 
 function StatCard({ label, value, sub, color }) {
   return (
-    <div className="card" style={{ padding: '18px 20px' }}>
-      <p style={{ fontSize: '1.8rem', fontWeight: 700, letterSpacing: '-0.03em', color: color || 'var(--text)', marginBottom: 3 }}>
+    <div className="card" style={{
+      padding: '18px 20px',
+      borderLeft: `3px solid ${color || 'var(--border2)'}`,
+      transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+      cursor: 'default',
+    }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 4px 24px ${color || '#fff'}18`; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
+    >
+      <p style={{ fontSize: '1.9rem', fontWeight: 700, letterSpacing: '-0.04em', color: color || 'var(--text)', marginBottom: 3, fontFamily: 'var(--mono)' }}>
         {value}
       </p>
-      <p style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text)', marginBottom: 2 }}>{label}</p>
-      <p style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{sub}</p>
+      <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text)', marginBottom: 2, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{label}</p>
+      <p style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>{sub}</p>
     </div>
   );
 }
 
 function EvidencePanel({ evidence }) {
+  const [expanded, setExpanded] = useState(null);
   if (!evidence?.length) return null;
 
   return (
     <div className="card" style={{ padding: '20px 22px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Source Evidence</span>
-        <span
-          style={{
-            fontSize: '0.62rem',
-            background: 'rgba(79,156,249,0.12)',
-            color: 'var(--primary)',
-            border: '1px solid rgba(79,156,249,0.25)',
-            borderRadius: 999,
-            padding: '2px 7px',
-          }}
-        >
+        <span style={{ fontWeight: 700, fontSize: '0.72rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>SOURCE EVIDENCE</span>
+        <span style={{ fontSize: '0.62rem', background: 'rgba(79,156,249,0.12)', color: 'var(--primary)', border: '1px solid rgba(79,156,249,0.25)', borderRadius: 4, padding: '2px 7px', fontFamily: 'var(--mono)' }}>
           operator context
         </span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {evidence.map((item, index) => (
-          <div
-            key={`${item.source}-${index}`}
-            style={{
-              padding: '12px 14px',
-              background: 'var(--surface2)',
-              border: '1px solid var(--border2)',
-              borderRadius: 10,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)' }}>{item.source}</span>
-              {item.url && (
-                <a
-                  href={item.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ fontSize: '0.72rem', color: 'var(--primary)', textDecoration: 'none' }}
-                >
-                  open {'->'}
-                </a>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {evidence.map((item, index) => {
+          const isOpen = expanded === index;
+          return (
+            <div
+              key={`${item.source}-${index}`}
+              onClick={() => setExpanded(isOpen ? null : index)}
+              style={{
+                padding: '12px 14px', background: 'var(--surface2)',
+                border: `1px solid ${isOpen ? 'rgba(79,156,249,0.35)' : 'var(--border2)'}`,
+                borderLeft: `3px solid ${isOpen ? 'var(--primary)' : 'var(--border2)'}`,
+                borderRadius: 8, cursor: 'pointer',
+                transition: 'all 0.18s ease',
+              }}
+              onMouseEnter={e => { if (!isOpen) e.currentTarget.style.borderLeftColor = 'var(--primary)'; }}
+              onMouseLeave={e => { if (!isOpen) e.currentTarget.style.borderLeftColor = 'var(--border2)'; }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: isOpen ? 'var(--primary)' : 'var(--text)' }}>{item.source}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  {item.url && (
+                    <a href={item.url} target="_blank" rel="noreferrer"
+                      onClick={e => e.stopPropagation()}
+                      style={{ fontSize: '0.65rem', color: 'var(--primary)', textDecoration: 'none', fontFamily: 'var(--mono)', border: '1px solid rgba(79,156,249,0.3)', borderRadius: 3, padding: '2px 6px' }}
+                    >
+                      OPEN ↗
+                    </a>
+                  )}
+                  <span style={{ fontSize: '0.65rem', color: 'var(--muted)', transition: 'transform 0.2s', display: 'inline-block', transform: isOpen ? 'rotate(180deg)' : 'none' }}>▾</span>
+                </div>
+              </div>
+              {isOpen && (
+                <p style={{ fontSize: '0.75rem', color: 'var(--muted)', lineHeight: 1.6, marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border2)' }}>
+                  {item.snippet}
+                </p>
               )}
             </div>
-            <p style={{ fontSize: '0.76rem', color: 'var(--muted)', lineHeight: 1.55 }}>{item.snippet}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -81,21 +93,12 @@ function PropagationPanel({ propagation }) {
   return (
     <div className="card" style={{ padding: '20px 22px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-        <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Propagation Model</span>
-        <span
-          style={{
-            fontSize: '0.62rem',
-            background: 'rgba(244,114,182,0.12)',
-            color: '#f472b6',
-            border: '1px solid rgba(244,114,182,0.25)',
-            borderRadius: 999,
-            padding: '2px 7px',
-          }}
-        >
+        <span style={{ fontWeight: 700, fontSize: '0.72rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>PROPAGATION MODEL</span>
+        <span style={{ fontSize: '0.62rem', background: 'rgba(244,114,182,0.12)', color: '#f472b6', border: '1px solid rgba(244,114,182,0.25)', borderRadius: 4, padding: '2px 7px', fontFamily: 'var(--mono)' }}>
           personalized pagerank
         </span>
       </div>
-      <p style={{ fontSize: '0.72rem', color: 'var(--muted)', marginBottom: 12, fontFamily: 'monospace' }}>
+      <p style={{ fontSize: '0.72rem', color: 'var(--muted)', marginBottom: 12, fontFamily: 'var(--mono)' }}>
         {propagation.formula}
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -189,53 +192,58 @@ function CommunityPanel({ community }) {
 
 function TopAffectedPanel({ rows, simulation }) {
   if (!rows?.length) return null;
-
   const adjusted = new Map((simulation?.top_affected || []).map((item) => [item.id, item]));
 
   return (
     <div className="card" style={{ padding: '20px 22px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Top Exposed Inputs</span>
-        <span style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>{rows.length} modeled nodes</span>
+        <span style={{ fontWeight: 700, fontSize: '0.72rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>TOP EXPOSED INPUTS</span>
+        <span style={{ fontSize: '0.68rem', color: 'var(--muted)', fontFamily: 'var(--mono)' }}>{rows.length} modeled nodes</span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {rows.map((row) => {
           const after = adjusted.get(row.id);
+          const riskColor = row.risk_before >= 70 ? '#f43f5e' : row.risk_before >= 45 ? '#f59e0b' : '#60a5fa';
           return (
             <div
               key={row.id}
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0,1.4fr) 90px 90px 110px',
-                gap: 12,
-                alignItems: 'center',
-                padding: '12px 14px',
-                background: 'var(--surface2)',
-                border: '1px solid var(--border2)',
-                borderRadius: 10,
+                padding: '12px 14px', borderRadius: 8,
+                background: 'var(--surface2)', border: '1px solid var(--border2)',
+                transition: 'border-color 0.15s, background 0.15s',
+                cursor: 'default',
               }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = riskColor + '40'; e.currentTarget.style.background = riskColor + '06'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.background = 'var(--surface2)'; }}
             >
-              <div style={{ minWidth: 0 }}>
-                <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text)', marginBottom: 3 }}>{row.name}</p>
-                <p style={{ fontSize: '0.68rem', color: 'var(--muted)', lineHeight: 1.5 }}>
-                  {(row.reasons || []).join(' | ') || 'modeled dependency pressure'}
-                </p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text)', marginBottom: 2 }}>{row.name}</p>
+                  <p style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>
+                    {(row.reasons || []).join(' | ') || 'modeled dependency pressure'}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexShrink: 0, marginLeft: 12 }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: '0.65rem', color: 'var(--muted)', marginBottom: 1 }}>Buffer</p>
+                    <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text)', fontFamily: 'var(--mono)' }}>{row.buffer_days}d</p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: '0.65rem', color: 'var(--muted)', marginBottom: 1 }}>Sub.</p>
+                    <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text)', fontFamily: 'var(--mono)' }}>{row.substitutability_pct}%</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p style={{ fontSize: '0.68rem', color: 'var(--muted)', marginBottom: 2 }}>Risk</p>
-                <p style={{ fontSize: '0.9rem', fontWeight: 700, color: row.risk_before >= 70 ? '#f43f5e' : row.risk_before >= 45 ? '#f59e0b' : '#60a5fa' }}>
+              {/* Inline risk bar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ flex: 1, height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${Math.min(100, row.risk_before)}%`, background: riskColor, borderRadius: 3, transition: 'width 0.8s ease' }} />
+                </div>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: riskColor, fontFamily: 'var(--mono)', minWidth: 28, textAlign: 'right' }}>
                   {Math.round(row.risk_before)}
-                  {after ? <span style={{ fontSize: '0.72rem', color: 'var(--green)' }}>{` -> ${Math.round(after.risk_after)}`}</span> : null}
-                </p>
-              </div>
-              <div>
-                <p style={{ fontSize: '0.68rem', color: 'var(--muted)', marginBottom: 2 }}>Buffer</p>
-                <p style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text)' }}>{row.buffer_days}d</p>
-              </div>
-              <div>
-                <p style={{ fontSize: '0.68rem', color: 'var(--muted)', marginBottom: 2 }}>Substitutability</p>
-                <p style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text)' }}>{row.substitutability_pct}%</p>
+                  {after && <span style={{ color: '#10b981' }}>{` →${Math.round(after.risk_after)}`}</span>}
+                </span>
               </div>
             </div>
           );
@@ -245,78 +253,69 @@ function TopAffectedPanel({ rows, simulation }) {
   );
 }
 
+
 function ActionLadder({ actions, activeActionId, onSimulate, loadingAction }) {
   if (!actions?.length) return null;
 
   return (
     <div className="card" style={{ padding: '20px 22px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>72-Hour Action Ladder</span>
-        <span
-          style={{
-            fontSize: '0.62rem',
-            background: 'rgba(79,156,249,0.12)',
-            color: 'var(--primary)',
-            border: '1px solid rgba(79,156,249,0.25)',
-            borderRadius: 999,
-            padding: '2px 7px',
-          }}
-        >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+        <span style={{ fontWeight: 700, fontSize: '0.72rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>72-HOUR ACTION LADDER</span>
+        <span style={{ fontSize: '0.62rem', background: 'rgba(79,156,249,0.12)', color: 'var(--primary)', border: '1px solid rgba(79,156,249,0.25)', borderRadius: 4, padding: '2px 7px', fontFamily: 'var(--mono)' }}>
           live simulation
         </span>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 14 }}>
-        {actions.map((action) => {
+        {actions.map((action, i) => {
           const active = activeActionId === action.id;
+          const accentColors = ['#f43f5e', '#f59e0b', '#10b981'];
+          const accent = accentColors[i % accentColors.length];
           return (
             <div
               key={action.id}
+              onClick={() => !loadingAction && onSimulate(action.id)}
               style={{
-                padding: '16px',
-                background: active ? 'rgba(79,156,249,0.08)' : 'var(--surface2)',
-                border: active ? '1px solid rgba(79,156,249,0.35)' : '1px solid var(--border2)',
-                borderRadius: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10,
+                padding: '16px', borderRadius: 10, cursor: 'pointer',
+                background: active ? `${accent}10` : 'var(--surface2)',
+                border: active ? `1px solid ${accent}50` : '1px solid var(--border2)',
+                borderLeft: `3px solid ${active ? accent : 'var(--border2)'}`,
+                display: 'flex', flexDirection: 'column', gap: 10,
+                transition: 'all 0.18s ease',
+                transform: active ? 'translateY(-2px)' : 'none',
+                boxShadow: active ? `0 4px 20px ${accent}20` : 'none',
               }}
+              onMouseEnter={e => { if (!active) { e.currentTarget.style.borderLeftColor = accent; e.currentTarget.style.transform = 'translateY(-1px)'; }}}
+              onMouseLeave={e => { if (!active) { e.currentTarget.style.borderLeftColor = 'var(--border2)'; e.currentTarget.style.transform = 'none'; }}}
             >
               <div>
-                <p style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>{action.label}</p>
-                <p style={{ fontSize: '0.73rem', color: 'var(--muted)', lineHeight: 1.55 }}>{action.summary}</p>
+                <p style={{ fontSize: '0.78rem', fontWeight: 700, color: active ? accent : 'var(--text)', marginBottom: 4, fontFamily: 'var(--mono)', letterSpacing: '0.02em' }}>{action.label}</p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--muted)', lineHeight: 1.6 }}>{action.summary}</p>
               </div>
 
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '0.68rem', color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 999, padding: '2px 8px' }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.62rem', color: active ? accent : 'var(--muted)', background: active ? `${accent}12` : 'var(--surface)', border: `1px solid ${active ? accent + '40' : 'var(--border)'}`, borderRadius: 4, padding: '2px 7px', fontFamily: 'var(--mono)' }}>
                   ${action.estimated_cost_usd_millions}M
                 </span>
-                <span style={{ fontSize: '0.68rem', color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 999, padding: '2px 8px' }}>
+                <span style={{ fontSize: '0.62rem', color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 7px', fontFamily: 'var(--mono)' }}>
                   {action.lead_time_hours}h
                 </span>
-                <span style={{ fontSize: '0.68rem', color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 999, padding: '2px 8px' }}>
+                <span style={{ fontSize: '0.62rem', color: '#10b981', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 4, padding: '2px 7px', fontFamily: 'var(--mono)' }}>
                   +{action.stockout_days_delta}d cover
                 </span>
               </div>
 
-              <button
-                onClick={() => onSimulate(action.id)}
-                disabled={loadingAction}
-                style={{
-                  marginTop: 'auto',
-                  padding: '10px 14px',
-                  borderRadius: 8,
-                  border: active ? '1px solid rgba(79,156,249,0.35)' : '1px solid var(--border)',
-                  background: active ? 'rgba(79,156,249,0.14)' : 'var(--surface)',
-                  color: active ? 'var(--primary)' : 'var(--text)',
-                  fontSize: '0.78rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  opacity: loadingAction ? 0.65 : 1,
-                }}
-              >
-                {loadingAction && active ? 'Running...' : active ? 'Showing impact' : 'Run impact'}
-              </button>
+              <div style={{
+                padding: '8px 12px', borderRadius: 6, textAlign: 'center',
+                background: active ? accent : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${active ? accent : 'var(--border)'}`,
+                fontSize: '0.72rem', fontWeight: 700, color: active ? '#fff' : 'var(--muted)',
+                fontFamily: 'var(--mono)', letterSpacing: '0.05em',
+                transition: 'all 0.15s',
+                opacity: loadingAction && !active ? 0.5 : 1,
+              }}>
+                {loadingAction && active ? 'RUNNING...' : active ? 'IMPACT SHOWN' : 'RUN IMPACT'}
+              </div>
             </div>
           );
         })}

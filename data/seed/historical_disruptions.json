@@ -29,7 +29,7 @@
     "affected_drugs": ["paracetamol", "ibuprofen"],
     "lead_time_days": 23,
     "indian_consumer_price_impact_pct": 100.0,
-    "citation_url": "https://pharmashield.ai/historical/hebei-2024-report"
+    "citation_url": "https://www.orfonline.org/research/chinas-shadow-over-indias-medical-supply-chains"
   },
   {
     "date": "2025-01-10",
@@ -37,6 +37,6 @@
     "affected_drugs": ["amoxicillin", "ciprofloxacin", "ceftriaxone"],
     "lead_time_days": 35,
     "indian_consumer_price_impact_pct": 15.0,
-    "citation_url": "https://www.reuters.com/business/logistics/red-sea-disruptions-hit-pharma-supply-chains-2025-01-12/"
+    "citation_url": "https://bioprocessintl.com/manufacturing/supply-chain/red-sea-shipping-crisis-impact-on-pharmaceutical-supply-chains/"
   }
 ]

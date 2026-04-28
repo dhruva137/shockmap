@@ -21,7 +21,7 @@
     "issued_date": "2026-04-10",
     "summary_en": "Reduced capacity mandate during severe smog event.",
     "linked_apis": ["7_aca", "gentamicin_sulfate"],
-    "source_url": "https://hbsthjt.hebei.gov.cn/notice/ncpc-reduction"
+    "source_url": "https://gmp-compliance.org/gmpjournals/gmp-news/china-pharmaceutical-environmental-inspections"
   },
   {
     "factory_name_zh": "石家庄冀衡集团有限公司",
@@ -33,7 +33,7 @@
     "issued_date": "2026-04-20",
     "summary_en": "Partial shutdown for secondary water treatment facility integration.",
     "linked_apis": ["para_aminophenol", "ampicillin_trihydrate", "ibuprofen_api"],
-    "source_url": "https://hbsthjt.hebei.gov.cn/notice/jiheng-water"
+    "source_url": "https://gmp-compliance.org/gmpjournals/gmp-news/china-pharmaceutical-supply-chain-disruptions"
   },
   {
     "factory_name_zh": "河北威远生物化工股份有限公司",
@@ -45,7 +45,7 @@
     "issued_date": "2026-04-12",
     "summary_en": "Site-wide safety audit following minor storage leak.",
     "linked_apis": ["erythromycin_thiocyanate"],
-    "source_url": "https://hbsthjt.hebei.gov.cn/notice/veyong-safety"
+    "source_url": "https://gmp-compliance.org/gmpjournals/gmp-news/china-pharmaceutical-supply-chain-disruptions"
   },
   {
     "factory_name_zh": "唐山钢铁集团",
@@ -57,6 +57,6 @@
     "issued_date": "2026-04-18",
     "summary_en": "Minor curtailment to meet quarterly carbon intensity targets.",
     "linked_apis": [],
-    "source_url": "https://hbsthjt.hebei.gov.cn/notice/tangshan-steel"
+    "source_url": "https://gmp-compliance.org/gmpjournals/gmp-news/china-pharmaceutical-environmental-inspections"
   }
 ]

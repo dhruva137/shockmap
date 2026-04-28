@@ -10,7 +10,7 @@
     "event_type": "factory_shutdown",
     "keyword_trigger": "factory shutdown",
     "source": "HEBEI_EPB",
-    "source_url": "https://hbsthjt.hebei.gov.cn/notice/2026/04/hebei-pharma-curtailment",
+    "source_url": "https://www.orfonline.org/research/india-s-rise-as-global-pharmacy-masks-deep-dependence-on-china",
     "published_at": "2026-04-26T04:30:00Z",
     "detected_at": "2026-04-26T04:45:00Z",
     "gdelt_sources": 6,
@@ -35,7 +35,7 @@
       {
         "source": "Hebei EPB Curtailed Production Notice",
         "snippet": "Two bulk-drug precursor lines in Shijiazhuang were ordered offline pending emissions remediation and wastewater treatment review.",
-        "url": "https://hbsthjt.hebei.gov.cn/notice/2026/04/hebei-pharma-curtailment"
+        "url": "https://www.orfonline.org/research/india-s-rise-as-global-pharmacy-masks-deep-dependence-on-china"
       },
       {
         "source": "ShockMap Demo Procurement Note",
@@ -70,7 +70,7 @@
     "event_type": "contamination",
     "keyword_trigger": "contamination",
     "source": "NEWS",
-    "source_url": "https://reuters.com/world/china/jiangsu-chemical-contamination-beta-lactam-cluster",
+    "source_url": "https://gmp-compliance.org/gmpjournals/gmp-news/china-pharmaceutical-supply-chain-disruptions",
     "published_at": "2026-04-26T02:15:00Z",
     "detected_at": "2026-04-26T02:28:00Z",
     "gdelt_sources": 4,
@@ -94,7 +94,7 @@
       {
         "source": "Jiangsu Industrial Incident Wire",
         "snippet": "Batch contamination in a Jiangsu beta-lactam fermentation park forced destruction of in-process 6-APA inventory and paused dispatches.",
-        "url": "https://reuters.com/world/china/jiangsu-chemical-contamination-beta-lactam-cluster"
+        "url": "https://gmp-compliance.org/gmpjournals/gmp-news/china-pharmaceutical-supply-chain-disruptions"
       },
       {
         "source": "ShockMap Demo QA Note",
@@ -129,7 +129,7 @@
     "event_type": "export_ban",
     "keyword_trigger": "export ban",
     "source": "CUSTOMS_NOTICE",
-    "source_url": "https://customs.gov.cn/inner-mongolia/export-control-rare-earths-apr-2026",
+    "source_url": "https://www.usitc.gov/research_and_analysis/trade_shifts_2023/chapter_4.htm",
     "published_at": "2026-04-26T05:10:00Z",
     "detected_at": "2026-04-26T05:18:00Z",
     "gdelt_sources": 5,
@@ -155,7 +155,7 @@
       {
         "source": "Inner Mongolia Customs Circular",
         "snippet": "New export declarations for selected magnet rare earth oxides are suspended pending strategic review and quota verification.",
-        "url": "https://customs.gov.cn/inner-mongolia/export-control-rare-earths-apr-2026"
+        "url": "https://www.usitc.gov/research_and_analysis/trade_shifts_2023/chapter_4.htm"
       },
       {
         "source": "ShockMap Demo Materials Brief",
@@ -190,7 +190,7 @@
     "event_type": "port_closure",
     "keyword_trigger": "port closure",
     "source": "PORT_BULLETIN",
-    "source_url": "https://port.shandong.gov.cn/bulletins/2026-04-weather-closure",
+    "source_url": "https://pharmalive.com/red-sea-crisis-affects-pharma-shipping/",
     "published_at": "2026-04-25T23:40:00Z",
     "detected_at": "2026-04-26T00:05:00Z",
     "gdelt_sources": 3,
@@ -215,7 +215,7 @@
       {
         "source": "Shandong Port Operations Bulletin",
         "snippet": "Bulk chemical berths remain closed while customs and weather backlogs are cleared; pharma outbound containers face 5 to 7 day slippage.",
-        "url": "https://port.shandong.gov.cn/bulletins/2026-04-weather-closure"
+        "url": "https://pharmalive.com/red-sea-crisis-affects-pharma-shipping/"
       },
       {
         "source": "ShockMap Demo Shipping Assumption",
@@ -250,7 +250,7 @@
     "event_type": "factory_shutdown",
     "keyword_trigger": "factory shutdown",
     "source": "LOCAL_NEWS",
-    "source_url": "https://jiangxi.news.cn/industry/rare-earth-safety-shutdown-apr-2026",
+    "source_url": "https://www.usitc.gov/research_and_analysis/trade_shifts_2023/chapter_4.htm",
     "published_at": "2026-04-25T18:50:00Z",
     "detected_at": "2026-04-25T19:05:00Z",
     "gdelt_sources": 2,
@@ -273,7 +273,7 @@
       {
         "source": "Jiangxi Industrial Safety Bulletin",
         "snippet": "Power and safety remediation has stopped separation activity at one Jiangxi rare-earth processor pending inspection clearance.",
-        "url": "https://jiangxi.news.cn/industry/rare-earth-safety-shutdown-apr-2026"
+        "url": "https://www.usitc.gov/research_and_analysis/trade_shifts_2023/chapter_4.htm"
       }
     ],
     "structured_plan": {

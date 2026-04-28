@@ -133,6 +133,20 @@ export default function AppShell({ children, selectedSectors }) {
               Engines: <span style={{ color: 'var(--green)', fontWeight: 600 }}>{health.engines_online}/3 online</span>
             </div>
           )}
+          <button
+            onClick={() => { localStorage.removeItem('shockmap_toured'); window.location.reload(); }}
+            style={{
+              marginTop: 10, width: '100%', padding: '6px 0',
+              background: 'transparent', border: '1px solid var(--border2)',
+              borderRadius: 5, color: 'var(--muted)', fontSize: '0.62rem',
+              cursor: 'pointer', fontFamily: 'var(--mono)', letterSpacing: '0.05em',
+              transition: 'border-color 0.15s, color 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(79,156,249,0.4)'; e.currentTarget.style.color = 'var(--primary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.color = 'var(--muted)'; }}
+          >
+            TAKE TOUR
+          </button>
         </div>
       </aside>
 

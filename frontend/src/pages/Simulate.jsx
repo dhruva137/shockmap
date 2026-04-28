@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useSearchParams } from 'react-router-dom';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { api } from '../api/client';
 
 const SEVERITIES = [
@@ -32,6 +33,7 @@ function RiskBar({ score }) {
 }
 
 export default function Simulate() {
+  const [searchParams] = useSearchParams();
   const [provinces, setProvinces]     = useState([]);
   const [province, setProvince]       = useState('');
   const [duration, setDuration]       = useState(30);
@@ -41,17 +43,37 @@ export default function Simulate() {
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState(null);
   const [graphLoading, setGraphLoading] = useState(true);
+  const [autoRan, setAutoRan]         = useState(false);
 
   useEffect(() => {
     api.getGraph()
       .then(g => {
         const ps = (g.nodes || []).filter(n => n.type === 'province');
         setProvinces(ps);
-        if (ps.length) setProvince(ps[0].id);
+        // Pre-fill from URL params
+        const urlProvince  = searchParams.get('province');
+        const urlSeverity  = searchParams.get('severity');
+        const urlDuration  = searchParams.get('duration');
+        const matched = urlProvince
+          ? ps.find(p => p.name?.toLowerCase() === urlProvince.toLowerCase() || p.id?.toLowerCase() === urlProvince.toLowerCase())
+          : null;
+        const targetId = matched?.id || (ps.length ? ps[0].id : '');
+        setProvince(targetId);
+        if (urlSeverity) setSeverity(urlSeverity);
+        if (urlDuration) setDuration(Number(urlDuration));
       })
       .catch(() => {})
       .finally(() => setGraphLoading(false));
   }, []);
+
+  // Auto-run if URL had province param — province/severity/duration now set, trigger
+  useEffect(() => {
+    if (!autoRan && province && searchParams.get('province') && !graphLoading) {
+      setAutoRan(true);
+      // Small delay to ensure state is fully committed
+      setTimeout(run, 50);
+    }
+  }, [province, graphLoading, autoRan]);
 
   async function run() {
     if (!province) return;
@@ -88,18 +110,28 @@ export default function Simulate() {
   }) || [];
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 900, animation: 'fade-in 0.35s ease' }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: '1.35rem', fontWeight: 700, letterSpacing: '-0.03em', marginBottom: 4 }}>
-          Shock Simulator
+    <div style={{ padding: '28px 32px', animation: 'fade-in 0.35s ease' }}>
+      <div style={{ marginBottom: 24, borderBottom: '1px solid var(--border2)', paddingBottom: 16 }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 4, fontFamily: 'var(--mono)' }}>
+          SHOCK IMPACT SIMULATOR
         </h1>
-        <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
-          Model downstream impact via Personalized PageRank ·{' '}
-          <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--muted)' }}>
-            R = PR(shock) × (1-S) × e^(−B/τ) × C
-          </span>
+        <p style={{ fontSize: '0.78rem', color: 'var(--muted)', fontFamily: 'var(--mono)' }}>
+          ENGINE 2 · Personalized PageRank · R = PR(shock) × (1−S) × e^(−B/τ) × C
         </p>
       </div>
+
+      {/* Pre-fill context banner */}
+      {searchParams.get('province') && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16,
+          padding: '10px 14px', background: 'rgba(245,158,11,0.08)',
+          border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8,
+          fontSize: '0.75rem', color: '#f59e0b', fontFamily: 'var(--mono)',
+        }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', display: 'inline-block', flexShrink: 0 }} />
+          PRE-FILLED FROM DASHBOARD — Province: {searchParams.get('province')} · Severity: {searchParams.get('severity') || 'partial_shutdown'}
+        </div>
+      )}
 
       {/* Config Card */}
       <div className="card" style={{ padding: '22px 24px', marginBottom: 20 }}>
@@ -174,12 +206,12 @@ export default function Simulate() {
         <button onClick={run} disabled={loading || !province}
           style={{
             width: '100%', padding: '12px', background: loading ? 'var(--surface2)' : 'var(--primary)',
-            color: loading ? 'var(--muted)' : '#fff', border: 'none', borderRadius: 10,
-            fontSize: '0.85rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
+            color: loading ? 'var(--muted)' : '#fff', border: 'none', borderRadius: 8,
+            fontSize: '0.82rem', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
+            letterSpacing: '0.06em', fontFamily: 'var(--mono)', transition: 'all 0.2s',
           }}
         >
-          {loading ? '⏳ Running PageRank simulation…' : '⚡ Run Simulation'}
+          {loading ? 'RUNNING SIMULATION...' : 'RUN SIMULATION'}
         </button>
       </div>
 
@@ -195,10 +227,11 @@ export default function Simulate() {
           {/* Propagation Explanation */}
           <div className="card" style={{ padding: '20px 22px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>📊 Propagation Analysis</span>
+              <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>PROPAGATION ANALYSIS</span>
               <span style={{
                 fontSize: '0.62rem', background: 'rgba(244,114,182,0.12)', color: '#f472b6',
-                border: '1px solid rgba(244,114,182,0.25)', borderRadius: 999, padding: '2px 7px',
+                border: '1px solid rgba(244,114,182,0.25)', borderRadius: 4, padding: '2px 7px',
+                fontFamily: 'var(--mono)',
               }}>
                 Personalized PageRank
               </span>
@@ -222,8 +255,8 @@ export default function Simulate() {
           {affectedWithPR.length > 0 ? (
             <div className="card" style={{ padding: '20px 22px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>
-                  Top {affectedWithPR.length} Affected Inputs
+                <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>
+                  TOP {affectedWithPR.length} AFFECTED INPUTS
                 </span>
                 <span style={{
                   fontSize: '0.62rem', background: 'rgba(251,191,36,0.12)', color: '#fbbf24',
@@ -305,8 +338,8 @@ export default function Simulate() {
           {/* Community Propagation Summary */}
           {propagation?.propagation_trace?.propagation_edges?.length > 0 && (
             <div className="card" style={{ padding: '20px 22px' }}>
-              <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'block', marginBottom: 14 }}>
-                🔗 Supply Chain Propagation Paths
+              <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em', display: 'block', marginBottom: 14 }}>
+                SUPPLY CHAIN PROPAGATION PATHS
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {propagation.propagation_trace.propagation_edges.slice(0, 8).map((edge, i) => (
@@ -337,8 +370,8 @@ export default function Simulate() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             {/* Risk Progression Over Time */}
             <div className="card" style={{ padding: '20px 22px' }}>
-              <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'block', marginBottom: 14 }}>
-                📈 Risk Progression
+              <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em', display: 'block', marginBottom: 14 }}>
+                RISK PROGRESSION OVER TIME
               </span>
               <ResponsiveContainer width="100%" height={240}>
                 <LineChart data={generateRiskProgression(duration, affectedWithPR)}>
@@ -353,8 +386,8 @@ export default function Simulate() {
 
             {/* Top Affected Drugs */}
             <div className="card" style={{ padding: '20px 22px' }}>
-              <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'block', marginBottom: 14 }}>
-                🔴 Top Affected Drugs
+              <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em', display: 'block', marginBottom: 14 }}>
+                TOP AFFECTED DRUGS
               </span>
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={affectedWithPR.slice(0, 5)}>
@@ -370,8 +403,8 @@ export default function Simulate() {
 
           {/* Supply Concentration Impact */}
           <div className="card" style={{ padding: '20px 22px' }}>
-            <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'block', marginBottom: 14 }}>
-              📊 Impact Summary
+            <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em', display: 'block', marginBottom: 14 }}>
+              IMPACT SUMMARY
             </span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
               <div style={{ padding: '14px', background: 'var(--surface2)', borderRadius: 10 }}>
@@ -400,6 +433,60 @@ export default function Simulate() {
               </div>
             </div>
           </div>
+
+          {/* Economic Cost Impact Panel */}
+          {result.total_economic_impact_usd_m > 0 && (
+            <div className="card" style={{ padding: '20px 22px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>
+                  ECONOMIC IMPACT ESTIMATE
+                </span>
+                <span style={{ fontSize: '0.62rem', color: 'var(--muted)', fontFamily: 'var(--mono)' }}>
+                  MODEL: risk-weighted market value · USD millions
+                </span>
+              </div>
+
+              {/* KPI row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 20 }}>
+                {[
+                  { label: 'STOCKOUT COST', value: result.estimated_stockout_cost_usd_m, color: '#f43f5e' },
+                  { label: 'EMERGENCY PROCUREMENT', value: result.emergency_procurement_cost_usd_m, color: '#f59e0b' },
+                  { label: 'TOTAL IMPACT', value: result.total_economic_impact_usd_m, color: '#60a5fa' },
+                ].map(kpi => (
+                  <div key={kpi.label} style={{ padding: '14px 16px', background: 'var(--surface2)', borderRadius: 8, borderLeft: `3px solid ${kpi.color}` }}>
+                    <p style={{ fontSize: '0.62rem', color: 'var(--muted)', fontFamily: 'var(--mono)', marginBottom: 6, letterSpacing: '0.05em' }}>{kpi.label}</p>
+                    <p style={{ fontSize: '1.4rem', fontWeight: 700, color: kpi.color, fontFamily: 'var(--mono)' }}>
+                      ${kpi.value.toFixed(1)}M
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Per-drug cost bar chart */}
+              {result.cost_by_drug?.length > 0 && (
+                <>
+                  <p style={{ fontSize: '0.68rem', color: 'var(--muted)', fontFamily: 'var(--mono)', marginBottom: 10 }}>COST BREAKDOWN BY INPUT</p>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={result.cost_by_drug.slice(0, 8)} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+                      <XAxis type="number" stroke="var(--muted)" style={{ fontSize: '0.65rem' }} tickFormatter={v => `$${v.toFixed(1)}M`} />
+                      <YAxis type="category" dataKey="name" stroke="var(--muted)" style={{ fontSize: '0.65rem' }} width={110} />
+                      <Tooltip
+                        contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border2)', borderRadius: 6, fontSize: '0.72rem' }}
+                        formatter={(v, name) => [`$${v.toFixed(2)}M`, name === 'stockout_cost_usd_m' ? 'Stockout' : 'Emergency']}
+                      />
+                      <Legend wrapperStyle={{ fontSize: '0.65rem' }} />
+                      <Bar dataKey="stockout_cost_usd_m" name="Stockout Cost" fill="#f43f5e" radius={[0, 3, 3, 0]} />
+                      <Bar dataKey="emergency_cost_usd_m" name="Emergency Procurement" fill="#f59e0b" radius={[0, 3, 3, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <p style={{ fontSize: '0.62rem', color: 'var(--muted)', marginTop: 10, fontFamily: 'var(--mono)' }}>
+                    * Indicative estimates based on risk-weighted annual market values. Not financial advice.
+                  </p>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

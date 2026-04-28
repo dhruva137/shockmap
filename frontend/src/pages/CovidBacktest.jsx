@@ -56,10 +56,10 @@ const TIMELINE = [
 ];
 
 const ENGINE_COLORS = {
-  1: { color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', label: 'Engine 1 · Signal Extraction', icon: '📡' },
-  2: { color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', label: 'Engine 2 · Graph Propagation', icon: '🕸️' },
-  3: { color: '#34d399', bg: 'rgba(52,211,153,0.1)', label: 'Engine 3 · Action Intelligence', icon: '🎯' },
-  null: { color: '#f43f5e', bg: 'rgba(244,63,94,0.1)', label: 'Real-world Outcome', icon: '⚠️' },
+  1: { color: '#38bdf8', bg: 'rgba(56,189,248,0.07)', label: 'Engine 1 · NER Signal', icon: '⬡' },
+  2: { color: '#a78bfa', bg: 'rgba(167,139,250,0.07)', label: 'Engine 2 · PageRank', icon: '⬡' },
+  3: { color: '#34d399', bg: 'rgba(52,211,153,0.07)', label: 'Engine 3 · Action Intel', icon: '⬡' },
+  null: { color: '#f43f5e', bg: 'rgba(244,63,94,0.07)', label: 'Real-world Outcome', icon: '▲' },
 };
 
 const SEV_COLORS = { warning: '#f59e0b', partial_shutdown: '#f97316', full_shutdown: '#f43f5e' };
@@ -99,11 +99,11 @@ function EngineBadge({ engine }) {
   if (!e) return null;
   return (
     <span style={{
-      fontSize: '0.62rem', fontWeight: 700, padding: '2px 8px', borderRadius: 999,
+      fontSize: '0.6rem', fontWeight: 700, padding: '2px 8px', borderRadius: 4,
       background: e.bg, color: e.color, border: `1px solid ${e.color}40`,
-      letterSpacing: '0.04em',
+      letterSpacing: '0.05em', fontFamily: 'var(--mono)', textTransform: 'uppercase',
     }}>
-      {e.icon} {e.label}
+      {e.label}
     </span>
   );
 }
@@ -126,25 +126,29 @@ function ConfidenceMeter({ value, color }) {
 /* ─────────────────────────── STAT STRIP ─────────────────────────── */
 function StatStrip() {
   const stats = [
-    { label: 'Prediction Lead Time', value: '67 days', color: '#34d399', icon: '⏱️' },
-    { label: 'Signals Processed', value: '3,847', color: '#38bdf8', icon: '📡' },
-    { label: 'APIs at Risk (Predicted)', value: '14 / 20', color: '#f59e0b', icon: '⚗️' },
-    { label: 'Actual Shortage Match', value: '93%', color: '#a78bfa', icon: '✅' },
-    { label: 'Countries Tracked', value: '12', color: '#f472b6', icon: '🌏' },
-    { label: 'Action Plan Generated', value: 'Jan 23', color: '#34d399', icon: '⚡' },
+    { label: 'Prediction Lead Time', value: '67 days', color: '#34d399' },
+    { label: 'Signals Processed', value: '3,847', color: '#38bdf8' },
+    { label: 'APIs at Risk (Predicted)', value: '14 / 20', color: '#f59e0b' },
+    { label: 'Actual Shortage Match', value: '93%', color: '#a78bfa' },
+    { label: 'Countries Tracked', value: '12', color: '#f472b6' },
+    { label: 'Action Plan Generated', value: 'Jan 23', color: '#34d399' },
   ];
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, marginBottom: 32 }}>
       {stats.map((s, i) => (
         <div key={i} style={{
-          padding: '16px 14px', borderRadius: 12,
-          background: `linear-gradient(135deg, ${s.color}08, ${s.color}04)`,
+          padding: '16px 14px', borderRadius: 10,
+          background: 'var(--surface2)',
           border: `1px solid ${s.color}25`,
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '1.3rem', marginBottom: 4 }}>{s.icon}</div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: s.color, letterSpacing: '-0.02em' }}>{s.value}</div>
-          <div style={{ fontSize: '0.62rem', color: 'var(--muted)', marginTop: 2, lineHeight: 1.4 }}>{s.label}</div>
+          borderLeft: `3px solid ${s.color}`,
+          transition: 'transform 0.15s, box-shadow 0.15s',
+          cursor: 'default',
+        }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 4px 16px ${s.color}18`; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
+        >
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: s.color, letterSpacing: '-0.03em', fontFamily: 'var(--mono)' }}>{s.value}</div>
+          <div style={{ fontSize: '0.6rem', color: 'var(--muted)', marginTop: 4, lineHeight: 1.4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
         </div>
       ))}
     </div>
@@ -187,19 +191,37 @@ export default function CovidBacktest() {
   return (
     <div style={{ padding: '28px 32px', maxWidth: 1200, animation: 'fade-in 0.3s ease' }}>
       <style>{`
-        @keyframes flowDown { 0%{transform:translateY(-100%)} 100%{transform:translateY(200%)} }
-        @keyframes ping { 0%{transform:scale(1);opacity:0.5} 100%{transform:scale(2.4);opacity:0} }
-        @keyframes fade-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes glowPulse { 0%,100%{opacity:0.7} 50%{opacity:1} }
+        @keyframes flowDown {
+          0%   { transform: translateY(-100%); opacity: 0; }
+          20%  { opacity: 1; }
+          80%  { opacity: 1; }
+          100% { transform: translateY(220%); opacity: 0; }
+        }
+        @keyframes ping {
+          0%   { transform: scale(1); opacity: 0.6; }
+          100% { transform: scale(2.6); opacity: 0; }
+        }
+        @keyframes scanline {
+          0%   { top: -4px; }
+          100% { top: 100%; }
+        }
+        @keyframes glowPulse {
+          0%,100% { opacity: 0.7; box-shadow: none; }
+          50%     { opacity: 1; box-shadow: 0 0 8px currentColor; }
+        }
+        @keyframes cardReveal {
+          from { opacity: 0; transform: translateX(-10px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
       `}</style>
 
       {/* ── Header ── */}
       <div style={{ marginBottom: 32 }}>
-        <button onClick={() => navigate('/dashboard')} style={{
+        <button onClick={() => navigate('/')} style={{
           background: 'transparent', border: 'none', color: 'var(--muted)',
-          fontSize: '0.82rem', cursor: 'pointer', marginBottom: 12, padding: 0,
-          textDecoration: 'underline',
-        }}>← Back to Dashboard</button>
+          fontSize: '0.78rem', cursor: 'pointer', marginBottom: 14, padding: 0,
+          fontFamily: 'var(--mono)', letterSpacing: '0.04em',
+        }}>← DASHBOARD</button>
 
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div>
@@ -275,6 +297,16 @@ export default function CovidBacktest() {
           ))}
         </div>
       </div>
+      {/* Progress track */}
+      <div style={{ height: 3, background: 'var(--border2)', borderRadius: 2, marginBottom: 28, overflow: 'hidden' }}>
+        <div style={{
+          height: '100%', borderRadius: 2,
+          background: 'linear-gradient(to right, #4f9cf9, #a78bfa)',
+          width: `${activeStep < 0 ? 0 : ((activeStep + 1) / TIMELINE.length) * 100}%`,
+          transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: '0 0 8px rgba(79,156,249,0.5)',
+        }} />
+      </div>
 
       {/* ── Signal Flow ── */}
       <div style={{ display: 'flex', gap: 24 }}>
@@ -317,45 +349,58 @@ export default function CovidBacktest() {
 
             return (
               <div key={i} style={{ marginBottom: i < TIMELINE.length - 1 ? 12 : 0 }}>
-                <div style={{
-                  padding: '18px 20px', borderRadius: 12,
-                  border: `1px solid ${isCurrent ? eConf.color + '60' : isActive ? eConf.color + '30' : 'var(--border)'}`,
-                  background: isCurrent ? eConf.bg : isActive ? `${eConf.color}06` : 'var(--surface)',
-                  opacity: isActive ? 1 : 0.4,
-                  transition: 'all 0.4s ease',
-                  transform: isCurrent ? 'scale(1.01)' : 'scale(1)',
-                  boxShadow: isCurrent ? `0 4px 24px ${eConf.color}18` : 'none',
-                  cursor: 'pointer',
-                }} onClick={() => { setPlaying(false); setActiveStep(i); }}>
+                <div
+                  onClick={() => { setPlaying(false); setActiveStep(i); }}
+                  style={{
+                    padding: '18px 20px', borderRadius: 10,
+                    border: `1px solid ${isCurrent ? eConf.color + '70' : isActive ? eConf.color + '30' : 'var(--border)'}`,
+                    background: isCurrent ? eConf.bg : isActive ? `${eConf.color}05` : 'var(--surface)',
+                    opacity: isActive ? 1 : 0.38,
+                    transition: 'all 0.35s ease',
+                    transform: isCurrent ? 'translateX(4px)' : 'none',
+                    boxShadow: isCurrent ? `0 0 0 1px ${eConf.color}30, 0 6px 28px ${eConf.color}14` : 'none',
+                    cursor: 'pointer', position: 'relative', overflow: 'hidden',
+                    animation: isCurrent ? 'cardReveal 0.3s ease' : 'none',
+                  }}
+                >
+                  {/* Scanline effect on active card */}
+                  {isCurrent && (
+                    <div style={{
+                      position: 'absolute', left: 0, right: 0, height: 2,
+                      background: `linear-gradient(to right, transparent, ${eConf.color}80, transparent)`,
+                      animation: 'scanline 2.4s linear infinite', pointerEvents: 'none',
+                    }} />
+                  )}
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 700, color: sevColor, background: `${sevColor}18`, border: `1px solid ${sevColor}40`, padding: '2px 8px', borderRadius: 999 }}>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 700, color: sevColor, background: `${sevColor}18`, border: `1px solid ${sevColor}40`, padding: '2px 8px', borderRadius: 4, fontFamily: 'var(--mono)' }}>
                         {step.date}
                       </span>
                       <EngineBadge engine={step.engine} />
                     </div>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--muted)', fontWeight: 600, letterSpacing: '0.06em' }}>{step.label}</span>
+                    <span style={{ fontSize: '0.62rem', color: 'var(--muted)', fontWeight: 700, letterSpacing: '0.08em', fontFamily: 'var(--mono)' }}>{step.label}</span>
                   </div>
 
-                  <h3 style={{ fontSize: '0.92rem', fontWeight: 700, margin: '0 0 6px', color: isCurrent ? eConf.color : 'var(--text)' }}>
+                  <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: '0 0 6px', color: isCurrent ? eConf.color : 'var(--text)', fontFamily: 'var(--mono)' }}>
                     {step.title}
                   </h3>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--muted)', lineHeight: 1.55, margin: '0 0 12px' }}>{step.detail}</p>
+                  <p style={{ fontSize: '0.77rem', color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 12px' }}>{step.detail}</p>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
                     {step.signals.map((sig, j) => (
                       <span key={j} style={{
-                        fontSize: '0.65rem', padding: '3px 8px', borderRadius: 6,
-                        background: `${eConf.color}12`, color: eConf.color,
-                        border: `1px solid ${eConf.color}30`, fontFamily: 'monospace',
-                        animation: isCurrent ? `glowPulse 2s ${j * 0.2}s infinite` : 'none',
+                        fontSize: '0.64rem', padding: '3px 9px', borderRadius: 4,
+                        background: `${eConf.color}10`, color: eConf.color,
+                        border: `1px solid ${eConf.color}35`, fontFamily: 'var(--mono)',
+                        transition: 'box-shadow 0.3s',
+                        boxShadow: isCurrent ? `0 0 6px ${eConf.color}40` : 'none',
                       }}>{sig}</span>
                     ))}
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--muted)', minWidth: 80 }}>Confidence</span>
+                    <span style={{ fontSize: '0.62rem', color: 'var(--muted)', minWidth: 80, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Confidence</span>
                     <ConfidenceMeter value={step.confidence} color={eConf.color} />
                   </div>
                 </div>
