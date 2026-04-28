@@ -16,26 +16,50 @@ const Badge = ({ status }) => {
   return <span style={{ fontSize:'0.55rem', fontWeight:800, padding:'2px 6px', borderRadius:4, background:c+'18', color:c, border:`1px solid ${c}40`, fontFamily:'var(--mono)' }}>{status}</span>;
 };
 
+// ── Fallback demo data (used when backend is unreachable) ────────────
+const FB_STATUS = { crisis:'HORMUZ BLOCKADE', status:'ACTIVE', severity:'CRITICAL', days_active:59, brent_crude_usd:118.4, brent_change_pct:'+34.2%', petrol_price_india_litre:127.4, petrol_change_since_crisis:'+18.2%', lng_price_usd_mmbtu:22.6, lng_change_pct:'+280%', strategic_reserve_days:87, strategic_reserve_status:'DEPLETING', india_import_pct_via_hormuz:85 };
+const FB_CRUDE = (() => { const s=[]; let p=88; for(let i=0;i<60;i++){p+=0.52+1.2*Math.sin(i*0.7); p=Math.max(70,Math.min(140,p)); s.push({date:`2026-${String(3+Math.floor(i/30)).padStart(2,'0')}-${String((i%30)+1).padStart(2,'0')}`,value:+p.toFixed(2)})} return {brent:s}; })();
+const FB_FUEL = (() => { const s=[]; let p=107.8; for(let i=0;i<60;i++){p+=0.34+0.45*Math.sin(i*0.5); p=Math.max(95,Math.min(135,p)); s.push({date:`2026-${String(3+Math.floor(i/30)).padStart(2,'0')}-${String((i%30)+1).padStart(2,'0')}`,value:+p.toFixed(2)})} return {petrol_inr_litre:s}; })();
+const FB_REFINERIES = [
+  {id:'jamnagar-1',name:'Reliance Jamnagar (SEZ)',company:'Reliance Industries',capacity_kbd:580,current_utilization_pct:64,shortfall_kbd:180,risk:'CRITICAL'},
+  {id:'kochi',name:'Kochi Refinery (BPCL)',company:'BPCL',capacity_kbd:310,current_utilization_pct:55,shortfall_kbd:127,risk:'CRITICAL'},
+  {id:'mangalore',name:'MRPL Mangaluru',company:'ONGC',capacity_kbd:300,current_utilization_pct:57,shortfall_kbd:111,risk:'CRITICAL'},
+  {id:'vizag',name:'Visakha Refinery (HPCL)',company:'HPCL',capacity_kbd:166,current_utilization_pct:78,shortfall_kbd:22,risk:'HIGH'},
+];
+const FB_MACRO = {gdp_impact_pct:-1.8,inflation_add_pct:2.4,rupee_vs_usd:87.4,current_account_deficit_bn_usd_annualised:38.4,forex_reserve_burn_rate_bn_usd_month:6.2,aviation_turbine_fuel_change_pct:48.2,freight_cost_increase_pct:62.4,food_inflation_add_pct:3.1};
+const FB_STOCKS = [
+  {ticker:'ONGC.NS',name:'Oil & Natural Gas Corp',price:224.8,change_pct:-12.4,sector:'Upstream Oil'},
+  {ticker:'BPCL.NS',name:'Bharat Petroleum Corp',price:298.3,change_pct:-21.6,sector:'Refining & Marketing'},
+  {ticker:'RELIANCE.NS',name:'Reliance Industries',price:2847.5,change_pct:-9.8,sector:'Integrated Energy'},
+];
+const FB_TIMELINE = [
+  {date:'Feb 28, 2026',event:'BLOCKADE BEGINS',desc:'IRGC mines and patrol boats establish maritime cordon at Hormuz. Brent crude spikes $18 in 6 hours.'},
+  {date:'Mar 14, 2026',event:'CAPE ROUTE ACTIVATED',desc:'142 tankers diverted via Cape of Good Hope. Transit time +18 days. LNG hits $22/MMBtu.'},
+  {date:'Apr 18, 2026',event:'REFINERY CRISIS',desc:'Reliance Jamnagar cuts throughput to 64% capacity. Fuel shortages reported in 6 states.'},
+  {date:'Apr 28, 2026',event:'DAY 59 ONGOING',desc:'Blockade continues. Strategic reserve at 87 days. Govt evaluating ration card fuel system.'},
+];
+
 export default function EnergyWatch() {
-  const [status, setStatus] = useState(null);
-  const [crude, setCrude] = useState(null);
-  const [fuel, setFuel] = useState(null);
+  const [status, setStatus] = useState(FB_STATUS);
+  const [crude, setCrude] = useState(FB_CRUDE);
+  const [fuel, setFuel] = useState(FB_FUEL);
   const [reserves, setReserves] = useState(null);
-  const [refineries, setRefineries] = useState([]);
-  const [stocks, setStocks] = useState([]);
-  const [macro, setMacro] = useState(null);
-  const [timeline, setTimeline] = useState([]);
+  const [refineries, setRefineries] = useState(FB_REFINERIES);
+  const [stocks, setStocks] = useState(FB_STOCKS);
+  const [macro, setMacro] = useState(FB_MACRO);
+  const [timeline, setTimeline] = useState(FB_TIMELINE);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const safe = (fn) => fn().catch(() => null);
     Promise.all([
-      api.getEnergyStatus(), api.getCrudePrices(), api.getFuelPricesIndia(),
-      api.getStrategicReserves(), api.getRefineries(), api.getEnergyStocks(),
-      api.getMacroImpact(), api.getEnergyTimeline(),
+      safe(api.getEnergyStatus), safe(api.getCrudePrices), safe(api.getFuelPricesIndia),
+      safe(api.getStrategicReserves), safe(api.getRefineries), safe(api.getEnergyStocks),
+      safe(api.getMacroImpact), safe(api.getEnergyTimeline),
     ]).then(([s,c,f,r,ref,st,m,t]) => {
-      setStatus(s); setCrude(c); setFuel(f); setReserves(r);
-      setRefineries(ref); setStocks(st); setMacro(m); setTimeline(t);
-    }).catch(console.error).finally(() => setLoading(false));
+      if(s) setStatus(s);   if(c) setCrude(c);    if(f) setFuel(f);    if(r) setReserves(r);
+      if(ref) setRefineries(ref); if(st) setStocks(st); if(m) setMacro(m); if(t) setTimeline(t);
+    }).finally(() => setLoading(false));
   }, []);
 
   if (loading) return (

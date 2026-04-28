@@ -1,5 +1,9 @@
 import logging
-import yfinance as yf
+try:
+    import yfinance as yf
+    HAS_YFINANCE = True
+except ImportError:
+    HAS_YFINANCE = False
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
 
@@ -37,24 +41,37 @@ class StockService:
 
         results = []
         for ticker, name in TICKERS.items():
-            try:
-                t = yf.Ticker(ticker)
-                hist = t.history(period="5d")
-                if not hist.empty and len(hist) >= 2:
-                    current_price = float(hist['Close'].iloc[-1])
-                    prev_price = float(hist['Close'].iloc[-2])
-                    change = ((current_price - prev_price) / prev_price) * 100
-                    results.append({
-                        "ticker": ticker.replace(".NS", ""),
-                        "name": name,
-                        "price": round(current_price, 2),
-                        "change": round(change, 2),
-                        "currency": "INR",
-                        "status": "DOWN" if change < 0 else "UP",
-                        "source": "live",
-                    })
-                else:
-                    # Market closed / no data — use fallback
+            if HAS_YFINANCE:
+                try:
+                    t = yf.Ticker(ticker)
+                    hist = t.history(period="5d")
+                    if not hist.empty and len(hist) >= 2:
+                        current_price = float(hist['Close'].iloc[-1])
+                        prev_price = float(hist['Close'].iloc[-2])
+                        change = ((current_price - prev_price) / prev_price) * 100
+                        results.append({
+                            "ticker": ticker.replace(".NS", ""),
+                            "name": name,
+                            "price": round(current_price, 2),
+                            "change": round(change, 2),
+                            "currency": "INR",
+                            "status": "DOWN" if change < 0 else "UP",
+                            "source": "live",
+                        })
+                    else:
+                        # Market closed / no data — use fallback
+                        fb = FALLBACK_PRICES.get(ticker, {"price": 1000.0, "change": 0.0})
+                        results.append({
+                            "ticker": ticker.replace(".NS", ""),
+                            "name": name,
+                            "price": fb["price"],
+                            "change": fb["change"],
+                            "currency": "INR",
+                            "status": "DOWN" if fb["change"] < 0 else "UP",
+                            "source": "cached",
+                        })
+                except Exception as e:
+                    logger.warning(f"yfinance rate-limited or error for {ticker}, using fallback: {e}")
                     fb = FALLBACK_PRICES.get(ticker, {"price": 1000.0, "change": 0.0})
                     results.append({
                         "ticker": ticker.replace(".NS", ""),
@@ -63,10 +80,10 @@ class StockService:
                         "change": fb["change"],
                         "currency": "INR",
                         "status": "DOWN" if fb["change"] < 0 else "UP",
-                        "source": "cached",
+                        "source": "fallback",
                     })
-            except Exception as e:
-                logger.warning(f"yfinance rate-limited for {ticker}, using fallback: {e}")
+            else:
+                # yfinance not installed — use fallback
                 fb = FALLBACK_PRICES.get(ticker, {"price": 1000.0, "change": 0.0})
                 results.append({
                     "ticker": ticker.replace(".NS", ""),

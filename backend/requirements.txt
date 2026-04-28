@@ -8,4 +8,4 @@ qdrant-client==1.11.1
 networkx==3.3
 python-louvain==0.16
 tenacity==9.0.0
-
+yfinance==0.2.37
